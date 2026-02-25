@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: DATAVET API
+  version: 0.2.0
+  description: API inicial implementada para HU-01 (login) y HU-02 (registro unificado).
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/health:
+    get:
+      summary: Estado de salud de la API
+      tags: [Health]
+      responses:
+        '200':
+          description: Servicio disponible
+
+  /api/auth/login:
+    post:
+      summary: Autenticación de usuario
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cedula, password]
+              properties:
+                cedula:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      nombre:
+                        type: string
+                      rol:
+                        type: string
+        '400':
+          description: Datos inválidos
+        '401':
+          description: Credenciales inválidas
+
+  /api/clientes/registrar:
+    post:
+      summary: Registro unificado de cliente y mascota
+      tags: [Clientes]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cliente
+                - mascota
+              properties:
+                cliente:
+                  type: object
+                  required: [nombre, telefono, correo]
+                  properties:
+                    nombre:
+                      type: string
+                    telefono:
+                      type: string
+                    correo:
+                      type: string
+                mascota:
+                  type: object
+                  required: [nombre, especie, raza]
+                  properties:
+                    nombre:
+                      type: string
+                    especie:
+                      type: string
+                    raza:
+                      type: string
+      responses:
+        '201':
+          description: Registro exitoso
+        '400':
+          description: Error de validación
+        '401':
+          description: Token inválido o ausente
+        '403':
+          description: Rol sin permisos
+        '409':
+          description: Conflicto de datos (duplicados)
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
