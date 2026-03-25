@@ -1,0 +1,232 @@
+openapi: 3.0.3
+info:
+  title: DATAVET API
+  version: 0.3.0
+  description: >
+    API backend para el sistema DATAVET (gestión veterinaria).
+    Implementa HU-01 (login con JWT) y HU-02 (registro unificado cliente+mascota).
+    Documentación interactiva disponible en /api/docs.
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Health
+    description: Estado del servicio
+  - name: Auth
+    description: Autenticación de usuarios
+  - name: Clientes
+    description: Registro de clientes y mascotas
+  - name: Mascotas
+    description: Consulta de mascotas
+
+paths:
+  /api/health:
+    get:
+      summary: Estado de salud de la API
+      tags: [Health]
+      responses:
+        '200':
+          description: Servicio disponible
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/auth/login:
+    post:
+      summary: Autenticación de usuario
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cedula, password]
+              properties:
+                cedula:
+                  type: string
+                  example: "1234567890"
+                password:
+                  type: string
+                  minLength: 6
+                  example: "segura123"
+      responses:
+        '200':
+          description: Login exitoso — retorna token JWT y datos del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      nombre:
+                        type: string
+                      rol:
+                        type: string
+                        enum: [admin, veterinario, recepcionista]
+        '400':
+          description: Datos inválidos (Zod)
+        '401':
+          description: Credenciales incorrectas o usuario inactivo
+
+  /api/clientes/registrar:
+    post:
+      summary: Registro unificado de cliente y mascota
+      tags: [Clientes]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cliente, mascota]
+              properties:
+                cliente:
+                  type: object
+                  required: [nombre, telefono, correo]
+                  properties:
+                    nombre:
+                      type: string
+                      example: "Ana García"
+                    telefono:
+                      type: string
+                      example: "3001234567"
+                    correo:
+                      type: string
+                      format: email
+                      example: "ana@correo.com"
+                mascota:
+                  type: object
+                  required: [nombre, especie, raza]
+                  properties:
+                    nombre:
+                      type: string
+                      example: "Max"
+                    especie:
+                      type: string
+                      example: "Perro"
+                    raza:
+                      type: string
+                      example: "Labrador"
+      responses:
+        '201':
+          description: Registro exitoso de cliente y mascota
+        '400':
+          description: Error de validación de campos
+        '401':
+          description: Token inválido o ausente
+        '403':
+          description: Rol sin permisos (solo admin y recepcionista)
+        '409':
+          description: Conflicto — correo ya registrado
+
+  /api/mascotas/cliente/{clienteId}:
+    get:
+      summary: Lista las mascotas de un cliente
+      tags: [Mascotas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Lista de mascotas del cliente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    cliente_id:
+                      type: integer
+                    nombre:
+                      type: string
+                    especie:
+                      type: string
+                    raza:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+        '400':
+          description: ID de cliente inválido
+        '401':
+          description: Token inválido o ausente
+
+  /api/mascotas/{id}:
+    get:
+      summary: Detalle de una mascota con datos del cliente propietario
+      tags: [Mascotas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Datos de la mascota y su cliente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  especie:
+                    type: string
+                  raza:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  cliente:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      nombre:
+                        type: string
+                      telefono:
+                        type: string
+                      correo:
+                        type: string
+        '400':
+          description: ID de mascota inválido
+        '401':
+          description: Token inválido o ausente
+        '404':
+          description: Mascota no encontrada
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

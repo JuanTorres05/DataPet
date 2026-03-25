@@ -1,0 +1,29 @@
+# ── Node / npm ─────────────────────────────────
+node_modules/
+npm-debug.log*
+.npm
+
+# ── Variables de entorno (NUNCA subir al repo) ─
+.env
+.env.local
+.env.*.local
+
+# ── Build outputs ───────────────────────────────
+dist/
+build/
+
+# ── Editores ────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── OS ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ────────────────────────────────────────
+*.log
+logs/
