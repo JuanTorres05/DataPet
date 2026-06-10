@@ -16,6 +16,15 @@ router.post(
   clientesController.registrar
 );
 
+// GET /api/clientes
+// Listar todos los clientes (todos los roles autenticados pueden ver la lista)
+router.get(
+  '/',
+  requireAuth,
+  clientesController.listar
+);
+
+
 // TODO: agregar rutas de búsqueda y listado en el sprint 2
 
 export default router;

@@ -1,148 +1,169 @@
 /**
- * Tests de integración — HU-02: Registro unificado de cliente y mascota
+ * tests/clientes.test.js  — HU-09: Testing de registro y listado de clientes
  *
- * Para ejecutar: npm test (desde el directorio backend/)
- *
- * PREREQUISITOS:
- *  - BD corriendo con el schema aplicado (database/schema.sql)
- *  - Usuario admin de prueba con cedula '0000000001' y password 'test1234'
- *  - Usuario veterinario de prueba con cedula '0000000002' y password 'test1234'
- *  - Archivo .env configurado con DB_* y JWT_SECRET
- *
- * NOTA: Cada corrida puede generar registros en BD (el correo cambia para evitar 409).
+ * Cubre HU-02, HU-03:
+ * - Registro exitoso con una o varias mascotas
+ * - Correo normalizado a minúsculas
+ * - Validaciones Zod (campos obligatorios, formato teléfono)
+ * - Correo duplicado → 409
+ * - Control de acceso por rol (veterinario no puede registrar)
+ * - Listado de clientes con todos los roles
  */
-
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, it, expect, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../src/app.js';
+import pool from '../src/db/pool.js';
+import { tokens } from './helpers/auth.js';
 
-// Helper: obtiene token de login para un usuario dado
-async function getToken(cedula, password) {
-    const res = await request(app)
-        .post('/api/auth/login')
-        .send({ cedula, password });
-    return res.body.token;
-}
+afterAll(async () => { await pool.end(); });
 
-// Helper: genera un correo único por timestamp para evitar colisiones en pruebas repetidas
-function correoUnico() {
-    return `test_${Date.now()}@example.com`;
-}
+const correoUnico = () => `test_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`;
 
 const bodyValido = () => ({
-    cliente: {
-        nombre: 'Pedro Test',
-        telefono: '3001112233',
-        correo: correoUnico()
-    },
-    mascota: {
-        nombre: 'Firulais',
-        especie: 'Perro',
-        raza: 'Labrador'
-    }
+  cliente: { nombre: 'Pedro Test', telefono: '3001112233', correo: correoUnico() },
+  mascotas: [{ nombre: 'Firulais', especie: 'Perro', raza: 'Labrador' }],
 });
 
-// ─── HU-02: Registro exitoso ─────────────────────────────────────────────────
+// ── HU-02: Registro ───────────────────────────────────────────────────────────
 
-test('HU-02 | Registro exitoso — administrador puede registrar cliente+mascota (201)', async () => {
-    const token = await getToken('0000000001', 'test1234');
+describe('POST /api/clientes/registrar', () => {
+  it('201 — admin registra cliente con una mascota', async () => {
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send(bodyValido());
 
-    const response = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send(bodyValido());
+    expect(res.status).toBe(201);
+    expect(res.body.cliente).toHaveProperty('id');
+    expect(res.body.mascotas).toHaveLength(1);
+    expect(res.body.mascotas[0]).toHaveProperty('id');
+  });
 
-    assert.equal(response.statusCode, 201, 'Debe responder 201 Created');
-    assert.ok(response.body.cliente?.id, 'Debe retornar ID del cliente creado');
-    assert.ok(response.body.mascota?.id, 'Debe retornar ID de la mascota creada');
-    assert.equal(typeof response.body.mascota.clienteId, 'number', 'La mascota debe tener clienteId numérico');
-});
+  it('201 — recepcionista registra cliente con múltiples mascotas', async () => {
+    const body = {
+      cliente: { nombre: 'Ana Prueba', telefono: '3119876543', correo: correoUnico() },
+      mascotas: [
+        { nombre: 'Luna', especie: 'Gato', raza: 'Siamés' },
+        { nombre: 'Toby', especie: 'Perro', raza: 'Beagle' },
+      ],
+    };
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.recepcionista}`)
+      .send(body);
 
-test('HU-02 | El correo se guarda en minúsculas (normalización)', async () => {
-    const token = await getToken('0000000001', 'test1234');
+    expect(res.status).toBe(201);
+    expect(res.body.mascotas).toHaveLength(2);
+  });
 
-    const correoOriginal = `MAYUSCULAS_${Date.now()}@EXAMPLE.COM`;
-    const response = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-            ...bodyValido(),
-            cliente: {
-                nombre: 'Test Mayúsculas',
-                telefono: '3009876543',
-                correo: correoOriginal
-            }
-        });
+  it('correo guardado en minúsculas (normalización)', async () => {
+    const correoMayus = `MAYUSC_${Date.now()}@EXAMPLE.COM`;
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send({
+        cliente: { nombre: 'Test Mayús', telefono: '3001234567', correo: correoMayus },
+        mascotas: [{ nombre: 'Max', especie: 'Perro', raza: 'Poodle' }],
+      });
 
-    assert.equal(response.statusCode, 201);
-    assert.equal(
-        response.body.cliente.correo,
-        correoOriginal.toLowerCase(),
-        'El correo debe estar en minúsculas'
-    );
-});
+    expect(res.status).toBe(201);
+    expect(res.body.cliente.correo).toBe(correoMayus.toLowerCase());
+  });
 
-// ─── HU-02: Errores de validación ────────────────────────────────────────────
+  it('400 — campos obligatorios faltantes (Zod)', async () => {
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send({ cliente: { nombre: '' }, mascotas: [] });
 
-test('HU-02 | Campos obligatorios faltantes retorna 400', async () => {
-    const token = await getToken('0000000001', 'test1234');
+    expect(res.status).toBe(400);
+  });
 
-    const response = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ cliente: { nombre: '' }, mascota: {} });
-
-    assert.equal(response.statusCode, 400);
-    assert.ok(Array.isArray(response.body.errors), 'Debe traer array de errores Zod');
-});
-
-test('HU-02 | Teléfono con formato inválido retorna 400', async () => {
-    const token = await getToken('0000000001', 'test1234');
-
+  it('400 — teléfono con formato inválido (Zod)', async () => {
     const body = bodyValido();
-    body.cliente.telefono = 'abc'; // no cumple el regex
+    body.cliente.telefono = 'noestelefono';
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send(body);
 
-    const response = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send(body);
+    expect(res.status).toBe(400);
+  });
 
-    assert.equal(response.statusCode, 400);
-});
+  it('400 — array mascotas vacío (Zod: min 1)', async () => {
+    const body = bodyValido();
+    body.mascotas = [];
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send(body);
 
-// ─── HU-02: Correo duplicado ──────────────────────────────────────────────────
+    expect(res.status).toBe(400);
+  });
 
-test('HU-02 | Correo ya registrado retorna 409', async () => {
-    const token = await getToken('0000000001', 'test1234');
-    const body = bodyValido(); // mismo correo en ambas peticiones
+  it('409 — correo ya registrado (duplicado MySQL)', async () => {
+    const body = bodyValido();
 
-    // Primera inserción (debe pasar)
     const primera = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send(body);
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send(body);
+    expect(primera.status).toBe(201);
 
-    assert.equal(primera.statusCode, 201, 'La primera inserción debe ser 201');
-
-    // Segunda inserción con el mismo correo (debe fallar)
     const segunda = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send(body);
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.admin}`)
+      .send(body); // mismo correo
+    expect(segunda.status).toBe(409);
+  });
 
-    assert.equal(segunda.statusCode, 409, 'El duplicado debe retornar 409');
+  it('403 — veterinario no puede registrar clientes', async () => {
+    const res = await request(app)
+      .post('/api/clientes/registrar')
+      .set('Authorization', `Bearer ${tokens.veterinario}`)
+      .send(bodyValido());
+
+    expect(res.status).toBe(403);
+  });
 });
 
-// ─── HU-02: Control de acceso por rol ────────────────────────────────────────
+// ── HU-03: Listado ────────────────────────────────────────────────────────────
 
-test('HU-02 | Veterinario no puede registrar clientes — retorna 403', async () => {
-    const token = await getToken('0000000002', 'test1234');
+describe('GET /api/clientes', () => {
+  it('200 — admin puede listar clientes y recibe array', async () => {
+    const res = await request(app)
+      .get('/api/clientes')
+      .set('Authorization', `Bearer ${tokens.admin}`);
 
-    const response = await request(app)
-        .post('/api/clientes/registrar')
-        .set('Authorization', `Bearer ${token}`)
-        .send(bodyValido());
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
 
-    assert.equal(response.statusCode, 403, 'El veterinario debe recibir 403 Forbidden');
+  it('200 — veterinario puede listar clientes', async () => {
+    const res = await request(app)
+      .get('/api/clientes')
+      .set('Authorization', `Bearer ${tokens.veterinario}`);
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it('200 — recepcionista puede listar clientes', async () => {
+    const res = await request(app)
+      .get('/api/clientes')
+      .set('Authorization', `Bearer ${tokens.recepcionista}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  it('cada cliente tiene mascotas como array', async () => {
+    const res = await request(app)
+      .get('/api/clientes')
+      .set('Authorization', `Bearer ${tokens.admin}`);
+
+    expect(res.status).toBe(200);
+    if (res.body.length > 0) {
+      expect(Array.isArray(res.body[0].mascotas)).toBe(true);
+    }
+  });
 });

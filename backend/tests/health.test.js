@@ -1,11 +1,14 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, it, expect, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../src/app.js';
+import pool from '../src/db/pool.js';
 
-test('GET /api/health responde 200', async () => {
-  const response = await request(app).get('/api/health');
+afterAll(async () => { await pool.end(); });
 
-  assert.equal(response.statusCode, 200);
-  assert.deepEqual(response.body, { status: 'ok' });
+describe('GET /api/health', () => {
+  it('200 — responde { status: ok }', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ status: 'ok' });
+  });
 });

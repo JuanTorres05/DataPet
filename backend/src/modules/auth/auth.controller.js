@@ -19,3 +19,13 @@ export async function login(req, res, next) {
     return next(err);
   }
 }
+
+export async function listarVets(req, res, next) {
+  try {
+    const result = await authService.listarVeterinarios();
+    return res.json(result);
+  } catch (err) {
+    return next(err);
+  }
+}
+

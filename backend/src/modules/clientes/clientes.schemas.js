@@ -1,11 +1,16 @@
 // Validaciones del módulo clientes con Zod
-// El schema refleja exactamente los campos de las tablas clientes y mascotas en BD
+// Se acepta ahora un array de mascotas (mínimo 1, máximo 10) para registro múltiple
 
 import { z } from 'zod';
 
 // Regex para teléfono: admite dígitos, +, -, espacios - entre 7 y 15 caracteres
-// Ejemplo válido: "3001234567", "+57 300 123 4567"
 const telefonoRegex = /^[0-9+\-\s]{7,15}$/;
+
+const mascotaSchema = z.object({
+  nombre:  z.string().min(1, 'El nombre de la mascota es obligatorio.').trim(),
+  especie: z.string().min(1, 'La especie es obligatoria.').trim(),
+  raza:    z.string().min(1, 'La raza es obligatoria.').trim()
+});
 
 export const registrarClienteMascotaSchema = z.object({
   // Sección del propietario
@@ -21,10 +26,9 @@ export const registrarClienteMascotaSchema = z.object({
       .transform((v) => v.toLowerCase().trim())
   }),
 
-  // Sección de la mascota
-  mascota: z.object({
-    nombre: z.string().min(1, 'El nombre de la mascota es obligatorio.').trim(),
-    especie: z.string().min(1, 'La especie es obligatoria.').trim(),
-    raza: z.string().min(1, 'La raza es obligatoria.').trim()
-  })
+  // Array de mascotas (mínimo 1, máximo 10 por registro)
+  mascotas: z
+    .array(mascotaSchema)
+    .min(1, 'Debes registrar al menos una mascota.')
+    .max(10, 'No puedes registrar más de 10 mascotas a la vez.')
 });

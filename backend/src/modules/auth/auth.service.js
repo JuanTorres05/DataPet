@@ -57,3 +57,15 @@ export async function login({ cedula, password }) {
     }
   };
 }
+
+export async function listarVeterinarios() {
+  const [rows] = await pool.execute(
+    `SELECT u.id, u.nombre 
+     FROM usuarios u
+     INNER JOIN roles r ON r.id = u.rol_id
+     WHERE r.nombre = 'veterinario' AND u.activo = 1
+     ORDER BY u.nombre`
+  );
+  return rows;
+}
+

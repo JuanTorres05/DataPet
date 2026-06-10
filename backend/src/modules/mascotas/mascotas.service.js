@@ -16,10 +16,6 @@ export async function listarPorCliente(clienteId) {
     return mascotas;
 }
 
-/**
- * Devuelve una mascota por su ID junto con los datos del cliente.
- * @param {number} mascotaId
- */
 export async function obtenerPorId(mascotaId) {
     const [rows] = await pool.execute(
         `SELECT m.id, m.nombre, m.especie, m.raza, m.created_at,
@@ -37,6 +33,27 @@ export async function obtenerPorId(mascotaId) {
     }
 
     const row = rows[0];
+
+    // Obtener historial clínico de la mascota
+    const [historial] = await pool.execute(
+        `SELECT h.id, h.fecha, h.motivo, h.diagnostico, h.tratamiento, h.notas, h.created_at,
+                u.nombre AS veterinario_nombre
+         FROM historial_clinico h
+         INNER JOIN usuarios u ON u.id = h.usuario_id
+         WHERE h.mascota_id = ?
+         ORDER BY h.fecha DESC`,
+        [mascotaId]
+    );
+
+    // Obtener citas de la mascota
+    const [citas] = await pool.execute(
+        `SELECT id, fecha_hora, motivo, estado 
+         FROM citas 
+         WHERE mascota_id = ? 
+         ORDER BY fecha_hora DESC`,
+        [mascotaId]
+    );
+
     return {
         id: row.id,
         nombre: row.nombre,
@@ -48,6 +65,31 @@ export async function obtenerPorId(mascotaId) {
             nombre: row.cliente_nombre,
             telefono: row.cliente_telefono,
             correo: row.cliente_correo
-        }
+        },
+        historial,
+        citas
     };
 }
+
+export async function crearHistorial({ mascota_id, usuario_id, fecha, motivo, diagnostico, tratamiento, notas }) {
+    const [result] = await pool.execute(
+        `INSERT INTO historial_clinico (mascota_id, usuario_id, fecha, motivo, diagnostico, tratamiento, notas)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [mascota_id, usuario_id, fecha, motivo, diagnostico, tratamiento, notas || null]
+    );
+
+    const newId = result.insertId;
+
+    const [rows] = await pool.execute(
+        `SELECT h.id, h.fecha, h.motivo, h.diagnostico, h.tratamiento, h.notas, h.created_at,
+                u.nombre AS veterinario_nombre
+         FROM historial_clinico h
+         INNER JOIN usuarios u ON u.id = h.usuario_id
+         WHERE h.id = ?
+         LIMIT 1`,
+        [newId]
+    );
+
+    return rows[0];
+}
+

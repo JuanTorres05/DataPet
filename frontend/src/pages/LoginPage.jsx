@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Spinner from '../components/Spinner';
-
-const GREEN = '#2E8B57';
-const GREEN_DK = '#247548';
-
-function getRolRedirect(rol) {
-  if (rol === 'recepcionista') return '/registrar';
-  return '/dashboard';
-}
+import { 
+  IdentificationCard, 
+  Lock, 
+  Eye, 
+  EyeSlash, 
+  ArrowRight,
+  ShieldCheck
+} from '@phosphor-icons/react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -39,7 +39,13 @@ export default function LoginPage() {
     try {
       const { data } = await api.post('/auth/login', form);
       login(data.token, data.user);
-      navigate(getRolRedirect(data.user.rol), { replace: true });
+      
+      // Redirect according to role
+      if (data.user.rol === 'recepcionista') {
+        navigate('/registrar', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (err) {
       const status = err.response?.status;
       if (status === 401) setApiError('Cédula o contraseña incorrectos.');
@@ -51,157 +57,170 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#F5F7FA' }}>
-
-      {/* Panel izquierdo — branding verde */}
-      <div
-        className="hidden lg:flex flex-col justify-between w-[45%] p-12 relative overflow-hidden"
-        style={{ backgroundColor: GREEN }}
-      >
-        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }} />
-        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full" style={{ backgroundColor: 'rgba(0,0,0,0.12)' }} />
-        <div className="absolute top-1/2 right-8 w-32 h-32 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
-
-        {/* Logo */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-            <span className="text-2xl">🐾</span>
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F7F8FA] overflow-hidden antialiased">
+      
+      {/* ── Left Panel: Editorial/Brand Section ── */}
+      <div className="md:w-[55%] bg-[#2A6B7C] text-white p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        
+        {/* Top Header */}
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
+            <span className="text-sm">🐾</span>
           </div>
-          <span className="text-white font-bold text-xl tracking-tight">DataVet</span>
+          <span className="font-bold text-sm tracking-tight uppercase tracking-wider">DataVet</span>
         </div>
 
-        {/* Ilustración central */}
-        <div className="relative z-10 text-center">
-          <div className="text-8xl mb-6 animate-pulse-soft">🐕</div>
-          <h2 className="text-white text-3xl font-bold leading-tight mb-4">
-            Cuida a tus pacientes<br />con tecnología
-          </h2>
-          <p className="text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.80)' }}>
-            Gestión veterinaria moderna, rápida y confiable.<br />
-            Todo lo que necesitas en un solo lugar.
+        {/* Center Copy */}
+        <div className="my-auto py-12 relative z-10 max-w-lg">
+          <span className="inline-flex rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-semibold bg-white/10 text-white/90 border border-white/10 mb-6">
+            Gestión Inteligente
+          </span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] mb-6">
+            Care with clarity.
+          </h1>
+          <p className="text-white/80 text-sm md:text-base max-w-[45ch] leading-relaxed">
+            Organiza el flujo de tu clínica en un entorno ágil. Agendamiento operativo, expedientes clínicos unificados y control de caja simplificado.
           </p>
-
-          <div className="mt-8 space-y-3">
-            {[
-              { icon: '📋', text: 'Registro de clientes y mascotas' },
-              { icon: '🗓️', text: 'Agenda de citas inteligente' },
-              { icon: '🔒', text: 'Acceso seguro por roles' },
-            ].map(f => (
-              <div
-                key={f.text}
-                className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-left"
-                style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-              >
-                <span className="text-xl">{f.icon}</span>
-                <span className="text-white text-sm font-medium">{f.text}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* Footer */}
-        <div className="relative z-10">
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.60)' }}>
-            DATAVET © {new Date().getFullYear()} · Todos los derechos reservados
-          </p>
+        {/* Footer Details */}
+        <div className="flex items-center gap-4 text-[10px] text-white/55 uppercase font-medium tracking-[0.15em] relative z-10">
+          <span>DataVet Platform</span>
+          <span>•</span>
+          <span>v2.1.0</span>
+          <span>•</span>
+          <span>Secure</span>
         </div>
       </div>
 
-      {/* Panel derecho — formulario */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md animate-fade-in">
-
-          {/* Header móvil */}
-          <div className="lg:hidden text-center mb-8">
-            <div
-              className="inline-flex w-14 h-14 rounded-2xl items-center justify-center mb-3"
-              style={{ backgroundColor: GREEN }}
-            >
-              <span className="text-3xl">🐾</span>
-            </div>
-            <h1 className="text-2xl font-bold text-slate-800">DataVet</h1>
-            <p className="text-slate-500 text-sm">Sistema de gestión veterinaria</p>
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-800">Bienvenido de vuelta 👋</h2>
-            <p className="text-slate-500 text-sm mt-1">Ingresa tus credenciales para continuar</p>
-          </div>
-
-          {apiError && (
-            <div className="alert-error mb-6">
-              <span className="text-lg">⚠️</span>
-              <span>{apiError}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-            <div>
-              <label className="label" htmlFor="cedula">Número de cédula</label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base select-none">🪪</span>
-                <input
-                  id="cedula" type="text" autoComplete="username"
-                  placeholder="Ej. 1234567890"
-                  value={form.cedula}
-                  onChange={(e) => setForm({ ...form, cedula: e.target.value })}
-                  className={`input-field pl-10 ${errors.cedula ? 'input-error' : ''}`}
-                />
+      {/* ── Right Panel: Form Section ── */}
+      <div className="md:w-[45%] flex items-center justify-center p-6 md:p-12 bg-[#F7F8FA]">
+        <div className="w-full max-w-[420px] animate-fade-in">
+          
+          {/* Double-Bezel Card Container */}
+          <div className="bezel-card-outer">
+            <div className="bezel-card-inner">
+              
+              <div className="mb-6">
+                <h2 className="text-lg font-bold text-[#1A2B30] tracking-tight">Acceso al Sistema</h2>
+                <p className="text-xs text-[#5C7078] mt-1.5 leading-relaxed">
+                  Ingresa tu cédula y contraseña asignada por el administrador.
+                </p>
               </div>
-              {errors.cedula && <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1"><span>●</span>{errors.cedula}</p>}
-            </div>
 
-            <div>
-              <label className="label" htmlFor="password">Contraseña</label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base select-none">🔑</span>
-                <input
-                  id="password"
-                  type={showPass ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className={`input-field pl-10 pr-12 ${errors.password ? 'input-error' : ''}`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-sm transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPass ? '🙈' : '👁️'}
-                </button>
-              </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1"><span>●</span>{errors.password}</p>}
-            </div>
-
-            <button type="submit" disabled={loading} className="btn-primary w-full py-3 text-base mt-2">
-              {loading ? <><Spinner size="sm" /> Verificando…</> : 'Ingresar al sistema'}
-            </button>
-          </form>
-
-          {/* Hint usuarios de prueba */}
-          <div className="mt-8 p-4 rounded-xl border" style={{ backgroundColor: '#eff6ff', borderColor: '#bfdbfe' }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: '#2C7BE5' }}>🧪 Usuarios de prueba</p>
-            <div className="space-y-1">
-              {[
-                { rol: 'Admin', cedula: '0000000001' },
-                { rol: 'Veterinario', cedula: '0000000002' },
-                { rol: 'Recepcionista', cedula: '0000000003' },
-              ].map(u => (
-                <div key={u.rol} className="flex justify-between text-xs" style={{ color: '#2563da' }}>
-                  <span className="font-medium">{u.rol}</span>
-                  <span>{u.cedula} · <em>test1234</em></span>
+              {apiError && (
+                <div className="alert-error mb-5 text-xs">
+                  <span>⚠️</span>
+                  <span>{apiError}</span>
                 </div>
-              ))}
+              )}
+
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                
+                {/* Cédula */}
+                <div className="space-y-1.5">
+                  <label className="label" htmlFor="cedula">
+                    Cédula de Identidad <span className="text-[#C0392B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <IdentificationCard size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#5C7078]" />
+                    <input
+                      id="cedula"
+                      type="text"
+                      autoComplete="username"
+                      placeholder="Ej. 0000000001"
+                      value={form.cedula}
+                      onChange={(e) => setForm({ ...form, cedula: e.target.value })}
+                      className={`input-field pl-11 ${errors.cedula ? 'input-error' : ''}`}
+                    />
+                  </div>
+                  {errors.cedula && (
+                    <p className="text-[#C0392B] text-[11px] font-medium flex items-center gap-1 select-none">
+                      <span>▲</span>{errors.cedula}
+                    </p>
+                  )}
+                </div>
+
+                {/* Contraseña */}
+                <div className="space-y-1.5">
+                  <label className="label" htmlFor="password">
+                    Contraseña <span className="text-[#C0392B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#5C7078]" />
+                    <input
+                      id="password"
+                      type={showPass ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      placeholder="••••••••"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      className={`input-field pl-11 pr-12 ${errors.password ? 'input-error' : ''}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#5C7078] hover:text-[#1A2B30] flex items-center justify-center"
+                      tabIndex={-1}
+                    >
+                      {showPass ? <EyeSlash size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-[#C0392B] text-[11px] font-medium flex items-center gap-1 select-none">
+                      <span>▲</span>{errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="btn-premium-primary w-full mt-3 uppercase tracking-wider text-xs font-semibold"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2 mx-auto">
+                      <Spinner size="sm" /> Verificando…
+                    </span>
+                  ) : (
+                    <>
+                      <span>Ingresar al sistema</span>
+                      <div className="btn-icon-wrapper">
+                        <ArrowRight size={12} weight="bold" />
+                      </div>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Cuentas de prueba */}
+              <div className="mt-6 p-4 rounded-xl border border-[#E2E8EA] bg-[#F7F8FA] space-y-2.5">
+                <p className="text-[10px] font-bold text-[#2A6B7C] uppercase tracking-[0.08em] flex items-center gap-1.5">
+                  <ShieldCheck size={14} weight="fill" />
+                  <span>Accesos de demostración</span>
+                </p>
+                <div className="space-y-1.5 divide-y divide-[#E2E8EA]">
+                  {[
+                    { rol: 'Administrador', cedula: '0000000001' },
+                    { rol: 'Veterinario', cedula: '0000000002' },
+                    { rol: 'Recepcionista', cedula: '0000000003' },
+                  ].map((u, i) => (
+                    <div key={u.rol} className={`flex justify-between text-[11px] text-[#5C7078] ${i > 0 ? 'pt-1.5' : ''}`}>
+                      <span className="font-semibold">{u.rol}</span>
+                      <span>{u.cedula} · <em className="not-italic font-semibold text-[#1A2B30]">test1234</em></span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <p className="text-center text-slate-300 text-xs mt-8">DATAVET © {new Date().getFullYear()}</p>
         </div>
       </div>
+      
     </div>
   );
 }

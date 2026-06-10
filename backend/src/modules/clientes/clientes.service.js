@@ -1,53 +1,92 @@
 // Servicio para el registro de clientes y mascotas (HU-02)
-// Lo más importante acá es la TRANSACCIÓN: si falla algo, no queda nada a medias
+// Ahora acepta un array de mascotas — todas se insertan en la misma transacción.
+// Si cualquier inserción falla, se hace rollback completo (ningún dato queda a medias).
 
 import pool from '../../db/pool.js';
 
-export async function registrarClienteMascota({ cliente, mascota }) {
-  // Pedimos una conexión dedicada para poder manejar la transacción nosotros mismos
+export async function registrarClienteMascota({ cliente, mascotas }) {
+  // Pedimos una conexión dedicada para manejar la transacción nosotros mismos
   const connection = await pool.getConnection();
 
   try {
-    // Iniciamos la transacción - a partir de acá ningún cambio queda guardado hasta el commit
     await connection.beginTransaction();
 
-    // Paso 1: insertar el cliente en su tabla
+    // Paso 1: insertar el cliente
     const [clienteResult] = await connection.execute(
       'INSERT INTO clientes (nombre, telefono, correo) VALUES (?, ?, ?)',
       [cliente.nombre, cliente.telefono, cliente.correo]
     );
 
-    // El insertId nos da el id que se le asignó al cliente recién creado
     const clienteId = clienteResult.insertId;
 
-    // Paso 2: insertar la mascota ya vinculada al cliente
-    // Si esto falla, el rollback también deshace la inserción del cliente
-    const [mascotaResult] = await connection.execute(
-      'INSERT INTO mascotas (cliente_id, nombre, especie, raza) VALUES (?, ?, ?, ?)',
-      [clienteId, mascota.nombre, mascota.especie, mascota.raza]
-    );
+    // Paso 2: insertar cada mascota vinculada al cliente en la misma transacción
+    const mascotasInsertadas = [];
 
-    // Todo bien, confirmamos los dos cambios en BD
+    for (const mascota of mascotas) {
+      const [mascotaResult] = await connection.execute(
+        'INSERT INTO mascotas (cliente_id, nombre, especie, raza) VALUES (?, ?, ?, ?)',
+        [clienteId, mascota.nombre, mascota.especie, mascota.raza]
+      );
+
+      mascotasInsertadas.push({
+        id: mascotaResult.insertId,
+        clienteId,
+        ...mascota
+      });
+    }
+
+    // Todo bien — confirmamos cliente + todas las mascotas en un solo commit
     await connection.commit();
 
-    // Devolvemos los datos creados para que el frontend pueda mostrar confirmación
     return {
       cliente: {
         id: clienteId,
         ...cliente
       },
-      mascota: {
-        id: mascotaResult.insertId,
-        clienteId,
-        ...mascota
-      }
+      mascotas: mascotasInsertadas
     };
+
   } catch (err) {
-    // Si algo salió mal, deshacemos TODO (cliente + mascota) para no dejar datos incompletos
+    // Si algo salió mal, deshacemos TODO para no dejar datos incompletos
     await connection.rollback();
-    throw err; // re-lanzamos el error para que lo maneje el error.middleware.js
+    throw err;
   } finally {
-    // Siempre devolvemos la conexión al pool, con o sin error
     connection.release();
   }
 }
+
+export async function listarClientes() {
+  const [rows] = await pool.execute(
+    `SELECT c.id, c.nombre, c.telefono, c.correo, 
+            m.id AS mascota_id, m.nombre AS mascota_nombre, m.especie, m.raza 
+     FROM clientes c 
+     LEFT JOIN mascotas m ON m.cliente_id = c.id 
+     ORDER BY c.nombre`
+  );
+
+  const clientesMap = new Map();
+
+  for (const row of rows) {
+    if (!clientesMap.has(row.id)) {
+      clientesMap.set(row.id, {
+        id: row.id,
+        nombre: row.nombre,
+        telefono: row.telefono,
+        correo: row.correo,
+        mascotas: []
+      });
+    }
+
+    if (row.mascota_id) {
+      clientesMap.get(row.id).mascotas.push({
+        id: row.mascota_id,
+        nombre: row.mascota_nombre,
+        especie: row.especie,
+        raza: row.raza
+      });
+    }
+  }
+
+  return Array.from(clientesMap.values());
+}
+

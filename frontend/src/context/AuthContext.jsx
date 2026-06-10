@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // Context de autenticación
 // Usamos React Context para que cualquier componente pueda saber si el usuario está logueado
 // sin tener que pasar props por todos los niveles del árbol de componentes

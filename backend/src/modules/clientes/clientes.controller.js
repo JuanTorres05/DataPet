@@ -19,3 +19,13 @@ export async function registrar(req, res, next) {
     return next(err);
   }
 }
+
+export async function listar(req, res, next) {
+  try {
+    const result = await clientesService.listarClientes();
+    return res.json(result);
+  } catch (err) {
+    return next(err);
+  }
+}
+
