@@ -1,54 +1,38 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../services/api';
-import { 
-  Users, 
-  MagnifyingGlass, 
-  Phone, 
-  Envelope, 
-  Cat, 
-  ArrowRight,
-  WarningCircle,
-  Plus
-} from '@phosphor-icons/react';
+﻿import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import api from "../services/api";
+import { Users, MagnifyingGlass, Phone, Envelope, Cat, ArrowRight, WarningCircle, Plus } from "@phosphor-icons/react";
 
 const PET_PALETTE = [
-  { accent: '#2A6B7C', bg: '#F0F7F9' },
-  { accent: '#7B5EA7', bg: '#F5F0FF' },
-  { accent: '#C0720A', bg: '#FFF5E6' },
-  { accent: '#2E7D52', bg: '#EBF5EF' },
-  { accent: '#B03060', bg: '#FFF0F5' },
+  { accent: "#1D4B58", bg: "#F2F6F7", bd: "#D5E2E4" },
+  { accent: "#7B5EA7", bg: "#F5F0FF", bd: "#D6C8F5" },
+  { accent: "#C0720A", bg: "#FFF5E6", bd: "#FFD4A0" },
+  { accent: "#2A8E79", bg: "#EBF7F5", bd: "#B2E0D9" },
+  { accent: "#B03060", bg: "#FFF0F5", bd: "#F5C0D0" },
 ];
-
-function getPaletteForIndex(i) {
-  return PET_PALETTE[i % PET_PALETTE.length];
-}
+function getPalette(i) { return PET_PALETTE[i % PET_PALETTE.length]; }
 
 export default function PacientesPage() {
-  const [clientes, setClientes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [clientes,     setClientes]     = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState("");
+  const [searchQuery,  setSearchQuery]  = useState("");
 
   const loadClientes = async () => {
     try {
-      setLoading(true);
-      setError('');
-      const res = await api.get('/clientes');
+      setLoading(true); setError("");
+      const res = await api.get("/clientes");
       setClientes(res.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al obtener el listado de clientes.');
+      setError(err.response?.data?.message || "Error al obtener el listado de clientes.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadClientes();
-  }, []);
+  useEffect(() => { loadClientes(); }, []);
 
-  // Filter clients
-  const filteredClientes = clientes.filter(c => 
+  const filteredClientes = clientes.filter(c =>
     c.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.telefono.includes(searchQuery) ||
     c.correo.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,142 +40,139 @@ export default function PacientesPage() {
   );
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in">
-      
-      {/* ── Page Header ── */}
-      <div className="flex items-center justify-between flex-wrap gap-4 page-header">
+    <div className="space-y-6 animate-fade-in">
+
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="page-title flex items-center gap-2">
-            <span>📋</span> Expedientes y Clientes
-          </h1>
-          <p className="page-subtitle">
-            Busca y consulta las fichas clínicas de las mascotas y sus respectivos dueños.
-          </p>
+          <h1 className="page-title">Expedientes y Clientes</h1>
+          <p className="page-subtitle">Busca y consulta las fichas clinicas de las mascotas y sus duenos.</p>
         </div>
-        
-        <Link to="/registrar" className="btn-premium-primary uppercase tracking-wider text-xs">
+        <Link to="/registrar" className="btn-premium-primary">
           <span>Nuevo Registro</span>
-          <div className="btn-icon-wrapper">
-            <Plus size={12} weight="bold" />
-          </div>
+          <div className="btn-icon-wrapper"><Plus size={13} weight="bold" /></div>
         </Link>
       </div>
 
-      {/* ── Search Bar Card (Double-Bezel) ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner relative">
-          <MagnifyingGlass size={18} className="absolute left-8 top-1/2 -translate-y-1/2 text-[#5C7078]" />
-          <input
-            type="text"
-            placeholder="Buscar por dueño, teléfono, correo o nombre de mascota..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-11 pr-4 bg-[#F7F8FA] border border-[#E2E8EA] rounded-xl text-sm focus:outline-none focus:border-[#2A6B7C] focus:bg-white transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] placeholder-[#5C7078]"
-          />
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <MagnifyingGlass size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "var(--color-muted)" }} />
+        <input
+          type="text"
+          placeholder="Buscar por dueno, telefono, correo o nombre de mascota..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="input-field pl-11"
+        />
       </div>
 
-      {/* ── Clientes Grid ── */}
-      {error && (
-        <div className="alert-error">
-          <WarningCircle size={20} className="flex-shrink-0" />
-          <div>
-            <p className="font-semibold text-sm">Error al cargar datos</p>
-            <p className="text-xs">{error}</p>
-          </div>
+      {/* Counter badge */}
+      {!loading && !error && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold" style={{ color: "var(--color-text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {filteredClientes.length}
+          </span>
+          <span className="text-sm" style={{ color: "var(--color-muted)" }}>
+            {filteredClientes.length === 1 ? "cliente encontrado" : "clientes encontrados"}
+          </span>
         </div>
       )}
 
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-3 p-4 rounded-xl border text-sm"
+          style={{ backgroundColor: "var(--color-danger-bg)", borderColor: "var(--color-danger)", color: "var(--color-danger)" }}>
+          <WarningCircle size={18} weight="bold" style={{ flexShrink: 0 }} />
+          <span className="font-semibold">{error}</span>
+        </div>
+      )}
+
+      {/* Loading */}
       {loading ? (
-        <div className="bezel-card-outer">
-          <div className="bezel-card-inner flex flex-col items-center justify-center p-12 space-y-4">
-            <div className="w-8 h-8 rounded-full border-2 border-[#2A6B7C] border-t-transparent animate-spin"></div>
-            <p className="text-xs text-[#5C7078] font-bold uppercase tracking-wider">Cargando expedientes...</p>
-          </div>
+        <div className="card flex flex-col items-center justify-center py-16 gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+            style={{ borderColor: "var(--color-primary)", borderTopColor: "transparent" }} />
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--color-muted)" }}>Cargando expedientes...</p>
         </div>
       ) : filteredClientes.length === 0 ? (
-        <div className="bezel-card-outer max-w-lg mx-auto">
-          <div className="bezel-card-inner text-center p-12">
-            <div className="w-16 h-16 rounded-2xl bg-[#F0F7F9] border border-[#C2DCE2] flex items-center justify-center text-3xl mx-auto mb-4">
-              👥
-            </div>
-            <h3 className="font-bold text-[#1A2B30] text-sm uppercase tracking-wide">No se encontraron clientes</h3>
-            <p className="text-[#5C7078] text-xs mt-2 leading-relaxed">
-              No hay coincidencias para "{searchQuery}". Intenta con otros términos o registra un nuevo propietario.
-            </p>
+        <div className="card flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-4"
+            style={{ backgroundColor: "var(--color-primary-lt)", border: "1.5px solid var(--color-primary-bd)" }}>
+            👥
           </div>
+          <h3 className="font-bold text-base" style={{ color: "var(--color-text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {searchQuery ? "Sin resultados" : "Sin clientes registrados"}
+          </h3>
+          <p className="text-sm mt-1.5 max-w-xs" style={{ color: "var(--color-muted)" }}>
+            {searchQuery
+              ? `No hay coincidencias para "${searchQuery}". Intenta con otros terminos.`
+              : "Registra el primer propietario y su mascota para empezar."}
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredClientes.map((c) => (
-            <div key={c.id} className="bezel-card-outer">
-              <div className="bezel-card-inner flex flex-col justify-between h-full space-y-5">
-                
-                {/* Header: Propietario info */}
-                <div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#F0F7F9] border border-[#C2DCE2] flex items-center justify-center text-[#2A6B7C] flex-shrink-0">
-                        <Users size={20} weight="duotone" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-[#1A2B30] text-sm leading-tight">{c.nombre}</h3>
-                        <span className="text-[10px] text-[#5C7078] font-bold uppercase tracking-wider">Propietario(a)</span>
-                      </div>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredClientes.map(c => (
+            <div key={c.id} className="card flex flex-col justify-between gap-4">
 
-                  <div className="mt-4 space-y-2 text-xs text-[#5C7078]">
-                    <p className="flex items-center gap-2 font-medium">
-                      <Phone size={14} className="text-[#2A6B7C]" />
-                      <span>{c.telefono}</span>
-                    </p>
-                    <p className="flex items-center gap-2 font-medium">
-                      <Envelope size={14} className="text-[#2A6B7C]" />
-                      <span className="truncate">{c.correo}</span>
-                    </p>
-                  </div>
+              {/* Owner info */}
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: "var(--color-primary-lt)", border: "1.5px solid var(--color-primary-bd)", color: "var(--color-primary)" }}>
+                  <Users size={18} weight="duotone" />
                 </div>
-
-                {/* Footer: List of Pets */}
-                <div className="pt-4 border-t border-[#E2E8EA] space-y-2.5">
-                  <p className="text-[10px] text-[#5C7078] font-bold uppercase tracking-wider flex items-center gap-1.5 select-none">
-                    <Cat size={14} />
-                    <span>Mascotas Registradas ({c.mascotas.length})</span>
-                  </p>
-
-                  {c.mascotas.length === 0 ? (
-                    <p className="text-xs text-[#5C7078] italic">Sin mascotas registradas.</p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {c.mascotas.map((m, idx) => {
-                        const palette = getPaletteForIndex(idx);
-                        return (
-                          <Link
-                            key={m.id}
-                            to={`/mascotas/${m.id}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-102 active:scale-98"
-                            style={{ 
-                              color: palette.accent, 
-                              backgroundColor: palette.bg, 
-                              borderColor: palette.accent + '30' 
-                            }}
-                          >
-                            <span>🐾 {m.nombre}</span>
-                            <ArrowRight size={10} className="transition-transform duration-300 group-hover:translate-x-0.5" />
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
+                <div className="min-w-0">
+                  <h3 className="font-bold text-base leading-tight truncate"
+                    style={{ color: "var(--color-text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    {c.nombre}
+                  </h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--color-muted)" }}>
+                    Propietario(a)
+                  </span>
                 </div>
-
               </div>
+
+              {/* Contact */}
+              <div className="space-y-1.5">
+                <p className="flex items-center gap-2 text-sm" style={{ color: "var(--color-muted)" }}>
+                  <Phone size={13} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
+                  <span className="font-medium truncate">{c.telefono}</span>
+                </p>
+                <p className="flex items-center gap-2 text-sm" style={{ color: "var(--color-muted)" }}>
+                  <Envelope size={13} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
+                  <span className="font-medium truncate">{c.correo}</span>
+                </p>
+              </div>
+
+              {/* Pets */}
+              <div className="pt-3 border-t" style={{ borderColor: "var(--color-border)" }}>
+                <p className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 mb-2 select-none"
+                  style={{ color: "var(--color-muted)" }}>
+                  <Cat size={12} />
+                  <span>Mascotas ({c.mascotas.length})</span>
+                </p>
+                {c.mascotas.length === 0 ? (
+                  <p className="text-xs italic" style={{ color: "var(--color-muted)" }}>Sin mascotas registradas.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {c.mascotas.map((m, idx) => {
+                      const p = getPalette(idx);
+                      return (
+                        <Link key={m.id} to={`/mascotas/${m.id}`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all active:scale-95"
+                          style={{ color: p.accent, backgroundColor: p.bg, borderColor: p.bd }}>
+                          🐾 {m.nombre}
+                          <ArrowRight size={9} weight="bold" />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
             </div>
           ))}
         </div>
       )}
-
     </div>
   );
 }

@@ -1,34 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── CSS Variables (Design Tokens) ───────────────────── */
+/* â”€â”€ CSS Variables (Design Tokens) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root {
-  --color-primary:     #2A6B7C;
-  --color-primary-dk:  #1E5060;
-  --color-primary-lt:  #F0F7F9;
-  --color-primary-bd:  #C2DCE2;
+  --color-primary:     #1D4B58; /* Slate Teal profundo */
+  --color-primary-dk:  #13323B; /* Slate Teal hover */
+  --color-primary-lt:  #F2F6F7; /* Fondo acento / Warm light */
+  --color-primary-bd:  #D5E2E4; /* Borde primario sutil */
   
-  --color-bg:          #F7F8FA;
+  --color-bg:          #FAFBFB; /* Fondo general cÃ¡lido clÃ­nico */
   --color-surface:     #FFFFFF;
-  --color-border:      #E2E8EA;
-  --color-text:        #1A2B30;
-  --color-muted:       #5C7078;
+  --color-border:      #EAF0F2; /* Borde gris azulado suave */
+  --color-text:        #182529; /* Inky Slate */
+  --color-muted:       #5C7278; /* Slate Muted */
   
-  /* Colores semánticos */
-  --color-success:     #2E7D52;
-  --color-success-bg:  #EBF5EF;
-  --color-warning:     #A86A00;
-  --color-warning-bg:  #FFF4E0;
-  --color-danger:      #C0392B;
-  --color-danger-bg:   #FDECEA;
+  /* Colores semÃ¡nticos */
+  --color-success:     #2A8E79; /* Jade Menta */
+  --color-success-bg:  #EBF7F5;
+  --color-warning:     #D97706; /* Ãmbar */
+  --color-warning-bg:  #FEF3C7;
+  --color-danger:      #DC2626; /* Rojo */
+  --color-danger-bg:   #FEE2E2;
 
   /* Custom Spring Physics Animation */
-  --transition-spring: all 0.7s cubic-bezier(0.32, 0.72, 0, 1);
-  --shadow-ambient:    0 6px 24px -4px rgba(26, 43, 48, 0.04), 0 2px 8px -2px rgba(26, 43, 48, 0.02);
-  --shadow-modal:      0 16px 48px -6px rgba(26, 43, 48, 0.12);
+  --transition-spring: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); /* MÃ¡s rÃ¡pida y fluida */
+  --shadow-ambient:    0 2px 12px -2px rgba(24, 37, 41, 0.03), 0 1px 4px -1px rgba(24, 37, 41, 0.02);
+  --shadow-modal:      0 20px 48px -10px rgba(24, 37, 41, 0.08);
 }
 
 @layer base {
@@ -36,8 +36,8 @@
     height: 100%;
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    font-size: 14px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -45,102 +45,148 @@
   }
   *, *::before, *::after { box-sizing: border-box; }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #E2E8EA; }
-  ::-webkit-scrollbar-thumb { background: #5C7078; border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #1A2B30; }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #FAFBFB; }
+  ::-webkit-scrollbar-thumb { background: #D5E2E4; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #5C7278; }
 }
 
 @layer components {
 
-  /* ── Double-Bezel Card Technique (Nested Hardware Architecture) ── */
-  .bezel-card-outer {
-    @apply border p-1.5 transition-all;
+  /* â”€â”€ Cards  â”€â”€ */
+  .card {
+    @apply bg-white border rounded-2xl p-5;
     border-color: var(--color-border);
-    background-color: rgba(226, 232, 234, 0.35);
-    border-radius: 1.75rem;
+    box-shadow: var(--shadow-ambient);
+    transition: var(--transition-spring);
+  }
+  .card:hover {
+    box-shadow: 0 4px 20px -4px rgba(24, 37, 41, 0.06);
+  }
+
+  /* Legacy bezel cards â€” mantenidos para compatibilidad */
+  .bezel-card-outer {
+    @apply border transition-all;
+    border-color: var(--color-border);
+    background-color: rgba(234, 240, 242, 0.4);
+    border-radius: 1.25rem;
+    padding: 3px;
     transition: var(--transition-spring);
   }
   
   .bezel-card-inner {
     @apply bg-white p-5 border;
     border-color: var(--color-border);
-    border-radius: calc(1.75rem - 0.375rem);
+    border-radius: calc(1.25rem - 3px);
     box-shadow: var(--shadow-ambient);
   }
 
-  /* ── Premium Buttons (Rounded Pills with Button-in-Button Trailing Icons) ── */
+  /* â”€â”€ Buttons â”€â”€ */
   .btn-premium-primary {
-    @apply inline-flex items-center justify-between gap-3 px-6 py-2.5 h-11
-           rounded-full text-white font-semibold text-sm select-none
+    @apply inline-flex items-center justify-between gap-3 px-6 py-3 h-11
+           rounded-xl text-white font-semibold select-none
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    font-size: 15px;
     background-color: var(--color-primary);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.01em;
     transition: var(--transition-spring);
   }
   .btn-premium-primary:hover {
     background-color: var(--color-primary-dk);
-    box-shadow: 0 4px 12px rgba(42, 107, 124, 0.15);
+    box-shadow: 0 4px 16px rgba(29, 75, 88, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-between gap-3 px-6 py-3 h-11
+           rounded-xl text-white font-semibold select-none
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    font-size: 15px;
+    background-color: var(--color-success);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: var(--transition-spring);
+  }
+  .btn-accent:hover {
+    background-color: #22766A;
+    box-shadow: 0 4px 16px rgba(42, 142, 121, 0.25);
+    transform: translateY(-1px);
   }
 
   .btn-premium-secondary {
-    @apply inline-flex items-center justify-between gap-3 px-6 py-2.5 h-11
-           rounded-full font-semibold text-sm border select-none
+    @apply inline-flex items-center justify-between gap-3 px-6 py-3 h-11
+           rounded-xl font-semibold border select-none
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    background-color: transparent;
+    font-size: 15px;
+    border-color: var(--color-border);
+    color: var(--color-text);
+    background-color: white;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     transition: var(--transition-spring);
   }
   .btn-premium-secondary:hover {
+    border-color: var(--color-primary-bd);
     background-color: var(--color-primary-lt);
+    color: var(--color-primary);
   }
 
   .btn-premium-danger {
-    @apply inline-flex items-center justify-between gap-3 px-6 py-2.5 h-11
-           rounded-full text-white font-semibold text-sm select-none
+    @apply inline-flex items-center justify-between gap-3 px-5 py-2.5 h-10
+           rounded-xl text-white font-semibold text-sm select-none
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
     background-color: var(--color-danger);
     transition: var(--transition-spring);
   }
   .btn-premium-danger:hover {
-    background-color: #A02B1E;
-    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.15);
+    background-color: #B91C1C;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
   }
 
-  /* Circular inner icon container (Button-in-Button trailing icon) */
   .btn-icon-wrapper {
-    @apply w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0;
+    @apply w-5 h-5 rounded-lg flex items-center justify-center text-xs flex-shrink-0;
     background-color: rgba(255, 255, 255, 0.2);
   }
   .btn-premium-secondary .btn-icon-wrapper {
-    background-color: rgba(42, 107, 124, 0.1);
+    background-color: rgba(29, 75, 88, 0.08);
   }
 
-  /* ── Inputs ── */
+  /* â”€â”€ Inputs â”€â”€ */
   .input-field {
-    @apply w-full h-11 px-4 rounded-xl border text-sm
-           bg-white text-slate-800 placeholder-slate-400;
+    @apply w-full h-11 px-4 rounded-xl border
+           bg-white placeholder-gray-400;
+    font-size: 15px;
+    color: var(--color-text);
     border-color: var(--color-border);
     transition: var(--transition-spring);
+  }
+  .input-field:hover {
+    border-color: var(--color-primary-bd);
   }
   .input-field:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(42, 107, 124, 0.08);
+    box-shadow: 0 0 0 3px rgba(29, 75, 88, 0.08);
   }
 
   .input-error {
     border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.06) !important;
   }
 
-  /* Labels (12px, weight 500, uppercase, letter-spacing 0.06em) */
+  /* Labels */
   .label {
-    @apply block text-xs font-semibold uppercase tracking-wider mb-2;
+    @apply block font-semibold uppercase tracking-wider mb-2;
+    font-size: 11px;
     color: var(--color-muted);
     letter-spacing: 0.06em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
-  /* ── Badges ── */
+  /* â”€â”€ Badges â”€â”€ */
   .badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold select-none uppercase tracking-wider;
     letter-spacing: 0.04em;
@@ -149,7 +195,7 @@
   .badge-yellow { @apply badge; background-color: var(--color-warning-bg); color: var(--color-warning); }
   .badge-red    { @apply badge; background-color: var(--color-danger-bg); color: var(--color-danger); }
 
-  /* ── Alerts ── */
+  /* â”€â”€ Alerts â”€â”€ */
   .alert {
     @apply flex items-start gap-3 p-4 rounded-xl text-sm border;
     transition: var(--transition-spring);
@@ -173,19 +219,95 @@
     color: var(--color-warning);
   }
 
-  /* ── Page title helper ── */
+  /* â”€â”€ Page title helper â”€â”€ */
   .section-title {
-    @apply font-bold uppercase tracking-wider mb-4;
+    @apply font-bold uppercase tracking-widest mb-4;
     font-size: 11px;
     color: var(--color-muted);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
-  .page-header   { @apply mb-8; }
-  .page-title    { @apply font-bold text-slate-800 tracking-tight; font-size: 20px; }
-  .page-subtitle { @apply text-sm mt-1.5; color: var(--color-muted); }
+  .page-header   { @apply mb-6; }
+  .page-title    {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.02em;
+  }
+  .page-subtitle { font-size: 15px; margin-top: 4px; color: var(--color-muted); }
+
+  /* â”€â”€ Stepper (Wizard Progress) â”€â”€ */
+  .stepper {
+    @apply flex items-center gap-0;
+  }
+  .stepper-step {
+    @apply flex items-center gap-2.5 flex-1;
+  }
+  .stepper-step:last-child {
+    @apply flex-none;
+  }
+  .stepper-circle {
+    @apply w-9 h-9 rounded-full flex items-center justify-center font-bold flex-shrink-0;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: var(--transition-spring);
+  }
+  .stepper-circle.done {
+    background-color: var(--color-success);
+    color: white;
+  }
+  .stepper-circle.active {
+    background-color: var(--color-primary);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(29, 75, 88, 0.12);
+  }
+  .stepper-circle.pending {
+    background-color: var(--color-border);
+    color: var(--color-muted);
+  }
+  .stepper-label {
+    @apply font-semibold;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: color 0.3s ease;
+  }
+  .stepper-label.active  { color: var(--color-primary); }
+  .stepper-label.done    { color: var(--color-success); }
+  .stepper-label.pending { color: var(--color-muted); }
+  .stepper-connector {
+    @apply flex-1 h-px mx-3;
+    background-color: var(--color-border);
+    transition: background-color 0.4s ease;
+  }
+  .stepper-connector.done {
+    background-color: var(--color-success);
+  }
+
+  /* â”€â”€ Skeleton loaders â”€â”€ */
+  .skeleton {
+    @apply rounded-lg animate-pulse;
+    background: linear-gradient(90deg, #EAF0F2 25%, #F2F6F7 50%, #EAF0F2 75%);
+    background-size: 200% 100%;
+    animation: skeleton-wave 1.6s infinite;
+  }
+  @keyframes skeleton-wave {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* â”€â”€ Fade in animation â”€â”€ */
+  .animate-fade-in {
+    animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 }
 
 /* Modales */
 .modal-shadow {
   box-shadow: var(--shadow-modal);
 }
+

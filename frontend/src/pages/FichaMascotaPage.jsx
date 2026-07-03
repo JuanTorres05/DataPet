@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
@@ -19,12 +19,12 @@ import {
 
 function getEspecieEmoji(especie) {
   const esp = especie?.toLowerCase();
-  if (esp?.includes('perro') || esp?.includes('can')) return '🐕';
-  if (esp?.includes('gato') || esp?.includes('fel')) return '🐈';
-  if (esp?.includes('ave') || esp?.includes('pajaro')) return '🦜';
-  if (esp?.includes('conejo')) return '🐇';
-  if (esp?.includes('reptil') || esp?.includes('tortuga') || esp?.includes('iguana')) return '🦎';
-  return '🐾';
+  if (esp?.includes('perro') || esp?.includes('can')) return 'ðŸ•';
+  if (esp?.includes('gato') || esp?.includes('fel')) return 'ðŸˆ';
+  if (esp?.includes('ave') || esp?.includes('pajaro')) return 'ðŸ¦œ';
+  if (esp?.includes('conejo')) return 'ðŸ‡';
+  if (esp?.includes('reptil') || esp?.includes('tortuga') || esp?.includes('iguana')) return 'ðŸ¦Ž';
+  return 'ðŸ¾';
 }
 
 function formatDate(dateStr) {
@@ -78,7 +78,7 @@ export default function FichaMascotaPage() {
   const handleSubmitHistorial = async (e) => {
     e.preventDefault();
     if (!motivoInput.trim()) return setFormError('El motivo de consulta es requerido.');
-    if (!diagnosticoInput.trim()) return setFormError('El diagnóstico es requerido.');
+    if (!diagnosticoInput.trim()) return setFormError('El diagnÃ³stico es requerido.');
     if (!tratamientoInput.trim()) return setFormError('El tratamiento es requerido.');
 
     try {
@@ -108,10 +108,10 @@ export default function FichaMascotaPage() {
       setDiagnosticoInput('');
       setTratamientoInput('');
       setNotasInput('');
-      setSuccessMsg('Entrada registrada con éxito.');
+      setSuccessMsg('Entrada registrada con Ã©xito.');
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Error al registrar la consulta clínica.');
+      setFormError(err.response?.data?.message || 'Error al registrar la consulta clÃ­nica.');
     } finally {
       setGuardando(false);
     }
@@ -121,7 +121,7 @@ export default function FichaMascotaPage() {
     return (
       <div className="flex flex-col items-center justify-center p-24 space-y-4">
         <div className="w-8 h-8 rounded-full border-2 border-[#2A6B7C] border-t-transparent animate-spin"></div>
-        <p className="text-xs text-[#5C7078] font-bold uppercase tracking-wider">Cargando expediente clínico...</p>
+        <p className="text-xs text-[#5C7078] font-bold uppercase tracking-wider">Cargando expediente clÃ­nico...</p>
       </div>
     );
   }
@@ -133,7 +133,7 @@ export default function FichaMascotaPage() {
           <WarningCircle size={20} className="flex-shrink-0" />
           <div>
             <p className="font-semibold text-sm">Error</p>
-            <p className="text-xs">{error || 'No se encontró el paciente.'}</p>
+            <p className="text-xs">{error || 'No se encontrÃ³ el paciente.'}</p>
           </div>
         </div>
         <Link to="/pacientes" className="btn-premium-secondary w-full mt-6 text-xs uppercase tracking-wider">
@@ -146,7 +146,7 @@ export default function FichaMascotaPage() {
   return (
     <div className="space-y-6 max-w-6xl mx-auto animate-fade-in">
       
-      {/* ── Back Link & Header ── */}
+      {/* â”€â”€ Back Link & Header â”€â”€ */}
       <div className="space-y-4 page-header">
         <Link 
           to="/pacientes" 
@@ -172,16 +172,16 @@ export default function FichaMascotaPage() {
         </div>
       </div>
 
-      {/* ── Split Layout (Editorial Split) ── */}
+      {/* â”€â”€ Split Layout (Editorial Split) â”€â”€ */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         
-        {/* ── LEFT PANEL (65%): Clinic History and Consult Forms ── */}
+        {/* â”€â”€ LEFT PANEL (65%): Clinic History and Consult Forms â”€â”€ */}
         <div className="w-full lg:w-[65%] space-y-6">
           
           {/* Form: Registrar Nueva Consulta (Admin or Veterinario only) */}
           {isVeterinarioOrAdmin && (
-            <div className="bezel-card-outer">
-              <div className="bezel-card-inner">
+            <div className="card">
+              <div className="">
                 
                 <h2 className="text-sm font-bold text-[#1A2B30] uppercase tracking-wider mb-4 flex items-center gap-2 select-none">
                   <Stethoscope size={18} className="text-[#2A6B7C]" />
@@ -207,7 +207,7 @@ export default function FichaMascotaPage() {
                     <label className="label">Motivo de consulta <span className="text-rose-600">*</span></label>
                     <input 
                       type="text"
-                      placeholder="Ej. Control post-quirúrgico, Vacunación triple felina, Dolor abdominal..."
+                      placeholder="Ej. Control post-quirÃºrgico, VacunaciÃ³n triple felina, Dolor abdominal..."
                       value={motivoInput}
                       onChange={(e) => setMotivoInput(e.target.value)}
                       className="input-field"
@@ -216,9 +216,9 @@ export default function FichaMascotaPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="label">Diagnóstico Clínico <span className="text-rose-600">*</span></label>
+                      <label className="label">DiagnÃ³stico ClÃ­nico <span className="text-rose-600">*</span></label>
                       <textarea
-                        placeholder="Describa los hallazgos y el diagnóstico..."
+                        placeholder="Describa los hallazgos y el diagnÃ³stico..."
                         value={diagnosticoInput}
                         onChange={(e) => setDiagnosticoInput(e.target.value)}
                         rows="3"
@@ -241,7 +241,7 @@ export default function FichaMascotaPage() {
                   <div className="space-y-1.5">
                     <label className="label">Notas adicionales (Opcional)</label>
                     <textarea
-                      placeholder="Recomendaciones para el hogar, fecha de próximo control..."
+                      placeholder="Recomendaciones para el hogar, fecha de prÃ³ximo control..."
                       value={notasInput}
                       onChange={(e) => setNotasInput(e.target.value)}
                       rows="2"
@@ -275,18 +275,18 @@ export default function FichaMascotaPage() {
             </div>
           )}
 
-          {/* Timeline: Historial Clínico */}
-          <div className="bezel-card-outer">
-            <div className="bezel-card-inner">
+          {/* Timeline: Historial ClÃ­nico */}
+          <div className="card">
+            <div className="">
               
               <h2 className="text-sm font-bold text-[#1A2B30] uppercase tracking-wider mb-6 flex items-center gap-2 select-none">
                 <Notebook size={18} className="text-[#2A6B7C]" />
-                <span>Historial de Consultas Clínicas ({mascota.historial.length})</span>
+                <span>Historial de Consultas ClÃ­nicas ({mascota.historial.length})</span>
               </h2>
 
               {mascota.historial.length === 0 ? (
                 <div className="text-center p-8 text-[#5C7078] italic text-xs">
-                  No hay registros clínicos en la base de datos de esta mascota.
+                  No hay registros clÃ­nicos en la base de datos de esta mascota.
                 </div>
               ) : (
                 <div className="relative border-l border-[#E2E8EA] ml-3 pl-6 space-y-6">
@@ -300,7 +300,7 @@ export default function FichaMascotaPage() {
                       <div className="p-4 rounded-xl border border-[#E2E8EA] bg-[#F7F8FA] space-y-3 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
                         <div className="flex justify-between items-start flex-wrap gap-2">
                           <div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078]">Fecha de atención</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078]">Fecha de atenciÃ³n</span>
                             <p className="font-bold text-xs text-[#1A2B30]">{formatDate(h.fecha)}</p>
                           </div>
                           <div className="text-right">
@@ -316,7 +316,7 @@ export default function FichaMascotaPage() {
                           </p>
                           
                           <p className="text-xs text-[#1A2B30] leading-relaxed">
-                            <strong className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078] block">Diagnóstico</strong>
+                            <strong className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078] block">DiagnÃ³stico</strong>
                             {h.diagnostico}
                           </p>
                           
@@ -344,12 +344,12 @@ export default function FichaMascotaPage() {
 
         </div>
 
-        {/* ── RIGHT PANEL (35%): Owner Detail & Appointment History ── */}
+        {/* â”€â”€ RIGHT PANEL (35%): Owner Detail & Appointment History â”€â”€ */}
         <div className="w-full lg:w-[35%] space-y-6">
           
           {/* Card: Propietario */}
-          <div className="bezel-card-outer">
-            <div className="bezel-card-inner">
+          <div className="card">
+            <div className="">
               
               <h2 className="text-sm font-bold text-[#1A2B30] uppercase tracking-wider mb-4 flex items-center gap-2 select-none">
                 <User size={18} className="text-[#2A6B7C]" />
@@ -378,8 +378,8 @@ export default function FichaMascotaPage() {
           </div>
 
           {/* Card: Citas agendadas */}
-          <div className="bezel-card-outer">
-            <div className="bezel-card-inner">
+          <div className="card">
+            <div className="">
               
               <h2 className="text-sm font-bold text-[#1A2B30] uppercase tracking-wider mb-4 flex items-center gap-2 select-none">
                 <Calendar size={18} className="text-[#2A6B7C]" />
@@ -422,3 +422,4 @@ export default function FichaMascotaPage() {
     </div>
   );
 }
+

@@ -7,8 +7,8 @@ import pool from '../../db/pool.js';
 import { env } from '../../config/env.js';
 import { UnauthorizedError } from '../../errors/http.errors.js';
 
-// Esta función recibe la cédula y contraseña, verifica en BD y retorna un token JWT
 export async function login({ cedula, password }) {
+  console.log(`[authService.login] Intentando login para cédula: "${cedula}"`);
   // Buscamos al usuario uniendo con la tabla de roles para saber qué puede hacer
   // La condición activo = 1 evita que usuarios desactivados entren al sistema
   const [rows] = await pool.execute(
@@ -23,17 +23,22 @@ export async function login({ cedula, password }) {
   // Si no encontramos el usuario, lanzamos error genérico
   // (no decimos si fue la cédula o la contraseña por seguridad)
   if (rows.length === 0) {
+    console.log(`[authService.login] Cédula no encontrada o usuario inactivo: "${cedula}"`);
     throw new UnauthorizedError('Credenciales inválidas.');
   }
 
   const user = rows[0];
+  console.log(`[authService.login] Cédula encontrada. Nombre: "${user.nombre}". Rol: "${user.rol}". Comparando contraseña...`);
 
   // Comparamos la contraseña que mandó el usuario con el hash guardado en BD
   const isValidPassword = await bcrypt.compare(password, user.password_hash);
 
   if (!isValidPassword) {
+    console.log(`[authService.login] Contraseña incorrecta para usuario: "${user.nombre}"`);
     throw new UnauthorizedError('Credenciales inválidas.');
   }
+
+  console.log(`[authService.login] Login exitoso para usuario: "${user.nombre}"`);
 
   // Todo bien, generamos el token con los datos que el frontend necesita saber
   // sub = subject (el id del usuario), rol lo usamos para mostrar/ocultar cosas

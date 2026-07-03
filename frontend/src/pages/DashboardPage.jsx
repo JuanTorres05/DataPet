@@ -1,78 +1,60 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
+﻿import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 import { 
-  Users, 
-  Cat, 
-  CalendarBlank, 
-  Stethoscope, 
-  ArrowRight,
-  Plus,
-  Info,
-  ClipboardText,
-  ChartBar
-} from '@phosphor-icons/react';
+  Users, Cat, CalendarBlank, Stethoscope,
+  ArrowRight, Plus, ClipboardText, ChartBar, TrendUp, Pulse
+} from "@phosphor-icons/react";
 
 const ROL_CONFIG = {
-  admin: {
-    icon: '🛡️', greeting: 'Panel de administración',
-  },
-  veterinario: {
-    icon: '🩺', greeting: 'Panel clínico',
-  },
-  recepcionista: {
-    icon: '📋', greeting: 'Panel de recepción',
-  },
+  admin:         { icon: "🛡️", greeting: "Panel de administracion" },
+  veterinario:   { icon: "🩺", greeting: "Panel clinico" },
+  recepcionista: { icon: "📋", greeting: "Panel de recepcion" },
 };
 
 const ROL_ACCESOS = {
   admin: [
-    { to: '/registrar', icon: Plus, label: 'Registrar Paciente', desc: 'Alta de nuevo propietario y su mascota en el sistema.', btnLabel: 'Nuevo Registro' },
-    { to: '/agenda', icon: CalendarBlank, label: 'Agenda de Citas', desc: 'Gestionar consultas médicas, estados y programación diaria.', btnLabel: 'Ver Agenda' },
-    { to: '/pacientes', icon: ClipboardText, label: 'Buscar Paciente', desc: 'Consultar expedientes, datos de contacto e historias clínicas.', btnLabel: 'Ver Pacientes' },
-    { to: '/reportes', icon: ChartBar, label: 'Reportes', desc: 'Métricas del sistema, citas atendidas y estadísticas de especies.', btnLabel: 'Ver Reportes' }
+    { to: "/registrar", icon: Plus,          label: "Registrar Paciente", desc: "Alta de nuevo propietario y su mascota en el sistema.",            btnLabel: "Nuevo Registro",  accent: "#1D4B58" },
+    { to: "/agenda",    icon: CalendarBlank, label: "Agenda de Citas",    desc: "Gestionar consultas medicas, estados y programacion diaria.",      btnLabel: "Ver Agenda",     accent: "#2A8E79" },
+    { to: "/pacientes", icon: ClipboardText, label: "Buscar Paciente",    desc: "Consultar expedientes, datos de contacto e historias clinicas.",    btnLabel: "Ver Pacientes",  accent: "#1D4B58" },
+    { to: "/reportes",  icon: ChartBar,      label: "Reportes",           desc: "Metricas del sistema, citas atendidas y estadisticas de especies.", btnLabel: "Ver Reportes",   accent: "#2A8E79" },
   ],
   recepcionista: [
-    { to: '/registrar', icon: Plus, label: 'Registrar Paciente', desc: 'Alta de nuevo propietario y su mascota en el sistema.', btnLabel: 'Nuevo Registro' },
-    { to: '/agenda', icon: CalendarBlank, label: 'Agenda de Citas', desc: 'Gestionar consultas médicas, estados y programación diaria.', btnLabel: 'Ver Agenda' },
-    { to: '/pacientes', icon: ClipboardText, label: 'Buscar Paciente', desc: 'Consultar expedientes, datos de contacto e historias clínicas.', btnLabel: 'Ver Pacientes' }
+    { to: "/registrar", icon: Plus,          label: "Registrar Paciente", desc: "Alta de nuevo propietario y su mascota en el sistema.",         btnLabel: "Nuevo Registro", accent: "#1D4B58" },
+    { to: "/agenda",    icon: CalendarBlank, label: "Agenda de Citas",    desc: "Gestionar consultas medicas, estados y programacion diaria.",   btnLabel: "Ver Agenda",     accent: "#2A8E79" },
+    { to: "/pacientes", icon: ClipboardText, label: "Buscar Paciente",    desc: "Consultar expedientes, datos de contacto e historias clinicas.", btnLabel: "Ver Pacientes",  accent: "#1D4B58" },
   ],
   veterinario: [
-    { to: '/agenda', icon: CalendarBlank, label: 'Agenda de Citas', desc: 'Visualizar pacientes agendados y registrar atención médica.', btnLabel: 'Ver Agenda' },
-    { to: '/pacientes', icon: ClipboardText, label: 'Buscar Paciente', desc: 'Consultar expedientes, datos de contacto e historias clínicas.', btnLabel: 'Ver Pacientes' },
-    { to: '/reportes', icon: ChartBar, label: 'Reportes', desc: 'Métricas clínicas, citas atendidas y actividad semanal.', btnLabel: 'Ver Reportes' }
+    { to: "/agenda",    icon: CalendarBlank, label: "Agenda de Citas",    desc: "Visualizar pacientes agendados y registrar atencion medica.",    btnLabel: "Ver Agenda",    accent: "#2A8E79" },
+    { to: "/pacientes", icon: ClipboardText, label: "Buscar Paciente",    desc: "Consultar expedientes, datos de contacto e historias clinicas.", btnLabel: "Ver Pacientes", accent: "#1D4B58" },
+    { to: "/reportes",  icon: ChartBar,      label: "Reportes",           desc: "Metricas clinicas, citas atendidas y actividad semanal.",         btnLabel: "Ver Reportes",  accent: "#2A8E79" },
   ],
 };
 
 function getHora() {
   const h = new Date().getHours();
-  if (h < 12) return 'Buenos días';
-  if (h < 18) return 'Buenas tardes';
-  return 'Buenas noches';
+  if (h < 12) return "Buenos dias";
+  if (h < 18) return "Buenas tardes";
+  return "Buenas noches";
 }
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const cfg = ROL_CONFIG[user?.rol] ?? ROL_CONFIG.admin;
+  const cfg     = ROL_CONFIG[user?.rol]  ?? ROL_CONFIG.admin;
   const accesos = ROL_ACCESOS[user?.rol] ?? [];
 
-  const [stats, setStats] = useState({
-    clientes: '—',
-    mascotas: '—',
-    citasHoy: '—',
-    veterinarios: '—'
-  });
+  const [stats,   setStats]   = useState({ clientes: "-", mascotas: "-", citasHoy: "-", veterinarios: "-" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadStats() {
       try {
         setLoading(true);
-        const res = await api.get('/citas/dashboard-stats');
+        const res = await api.get("/citas/dashboard-stats");
         setStats(res.data);
       } catch (err) {
-        console.error('Error al cargar métricas del dashboard', err);
+        console.error("Error al cargar metricas del dashboard", err);
       } finally {
         setLoading(false);
       }
@@ -81,101 +63,103 @@ export default function DashboardPage() {
   }, []);
 
   const statsItems = [
-    { label: 'Clientes activos', value: stats.clientes, icon: Users, color: '#2A6B7C', bg: '#F0F7F9' },
-    { label: 'Mascotas',         value: stats.mascotas, icon: Cat, color: '#2A6B7C', bg: '#F0F7F9' },
-    { label: 'Citas hoy',        value: stats.citasHoy, icon: CalendarBlank, color: '#A86A00', bg: '#FFF4E0' },
-    { label: 'Veterinarios',     value: stats.veterinarios, icon: Stethoscope, color: '#2E7D52', bg: '#EBF5EF' },
+    { label: "Clientes activos",  value: stats.clientes,     icon: Users,        accent: "var(--color-primary)",    bg: "var(--color-primary-lt)",  bd: "var(--color-primary-bd)" },
+    { label: "Mascotas",          value: stats.mascotas,     icon: Cat,          accent: "var(--color-success)",    bg: "var(--color-success-bg)",  bd: "#B2E0D9" },
+    { label: "Citas hoy",         value: stats.citasHoy,     icon: CalendarBlank,accent: "var(--color-warning)",    bg: "var(--color-warning-bg)",  bd: "#FCD34D" },
+    { label: "Veterinarios",      value: stats.veterinarios, icon: Stethoscope,  accent: "var(--color-primary-dk)", bg: "var(--color-primary-lt)",  bd: "var(--color-primary-bd)" },
   ];
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto animate-fade-in">
-      
-      {/* ── Header Welcome Section (Double-Bezel Card) ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner flex items-center justify-between flex-wrap gap-5">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-[#F0F7F9] text-[#2A6B7C] border border-[#C2DCE2]">
-              {cfg.icon}
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078]">{getHora()}</p>
-              <h1 className="text-xl font-bold text-[#1A2B30] mt-0.5 tracking-tight">{user?.nombre}</h1>
-              <span className="text-[10px] text-[#5C7078] font-semibold uppercase tracking-wider">{cfg.greeting}</span>
-            </div>
-          </div>
+    <div className="space-y-6 h-full animate-fade-in">
 
-          <div className="border border-[#E2E8EA] bg-[#F7F8FA] rounded-xl px-4 py-2.5 text-right min-w-[155px] shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)]">
-            <p className="font-bold text-xs text-[#1A2B30] uppercase tracking-wider">
-              {new Date().toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
-            </p>
-            <p className="text-[11px] font-medium text-[#5C7078] mt-0.5">
-              {new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true })}
-            </p>
+      {/* ── Top Bar: Welcome + Date ── */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
+            style={{ backgroundColor: "var(--color-primary-lt)", border: "1.5px solid var(--color-primary-bd)" }}>
+            {cfg.icon}
           </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider"
+              style={{ color: "var(--color-muted)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {getHora()}
+            </p>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "20px", fontWeight: "700", color: "var(--color-text)", letterSpacing: "-0.02em" }}>
+              {user?.nombre}
+            </h1>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--color-muted)" }}>
+              {cfg.greeting}
+            </span>
+          </div>
+        </div>
+
+        <div className="rounded-xl border px-4 py-2.5 text-right flex-shrink-0"
+          style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", boxShadow: "var(--shadow-ambient)" }}>
+          <p className="font-bold text-xs tracking-wide"
+            style={{ color: "var(--color-text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+          <p className="text-xs font-medium mt-0.5" style={{ color: "var(--color-muted)" }}>
+            {new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: true })}
+          </p>
         </div>
       </div>
 
-      {/* ── Stats Section (Grid Layout, Double-Bezel ambient shadow cards) ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* ── KPI Grid: siempre 4 columnas en pantalla normal ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statsItems.map((s, idx) => {
-          const IconComponent = s.icon;
+          const Icon = s.icon;
           return (
-            <div key={idx} className="bezel-card-outer">
-              <div className="bezel-card-inner flex items-center gap-4 h-full">
-                <div 
-                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border"
-                  style={{ 
-                    backgroundColor: s.bg, 
-                    color: s.color,
-                    borderColor: s.color === '#2A6B7C' ? '#C2DCE2' : s.color === '#A86A00' ? '#FFE3B3' : '#C7E2D2'
-                  }}
-                >
-                  <IconComponent size={24} weight="duotone" />
+            <div key={idx} className="card">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center border"
+                  style={{ backgroundColor: s.bg, borderColor: s.bd, color: s.accent }}>
+                  <Icon size={20} weight="duotone" />
                 </div>
-                <div>
-                  <p className="text-3xl font-bold text-[#1A2B30] tracking-tight leading-none">
-                    {loading ? '...' : s.value}
-                  </p>
-                  <p className="text-[10px] text-[#5C7078] font-bold uppercase tracking-wider mt-1.5 leading-tight">
-                    {s.label}
-                  </p>
-                </div>
+                <TrendUp size={13} style={{ color: "var(--color-success)", marginTop: "2px" }} />
               </div>
+              <p className="font-bold leading-none mb-1.5"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "32px", color: "var(--color-text)", letterSpacing: "-0.04em" }}>
+                {loading ? <span className="skeleton inline-block w-10 h-7 rounded" /> : s.value}
+              </p>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--color-muted)" }}>
+                {s.label}
+              </p>
             </div>
           );
         })}
       </div>
 
-      {/* ── Quick Actions Section ── */}
-      <div>
-        <h2 className="section-title">Acciones rápidas</h2>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* ── Acciones Rapidas: grid que se expande ── */}
+      <div className="flex-1">
+        <p className="section-title mb-4">Acciones rapidas</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {accesos.map((acc, idx) => {
             const ActionIcon = acc.icon;
             return (
-              <div key={idx} className="bezel-card-outer">
-                <div className="bezel-card-inner flex flex-col justify-between h-[180px]">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#F0F7F9] text-[#2A6B7C] border border-[#C2DCE2]">
-                        <ActionIcon size={18} weight="bold" />
-                      </div>
-                      <h3 className="font-bold text-[#1A2B30] text-sm tracking-tight">{acc.label}</h3>
+              <div key={idx} className="card flex flex-col justify-between" style={{ minHeight: "160px" }}>
+                <div>
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: acc.accent + "15", color: acc.accent, border: "1px solid " + acc.accent + "25" }}>
+                      <ActionIcon size={16} weight="bold" />
                     </div>
-                    <p className="text-[#5C7078] text-xs leading-relaxed mt-2">{acc.desc}</p>
+                    <h3 className="font-bold text-sm leading-tight"
+                      style={{ color: "var(--color-text)", fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: "-0.01em" }}>
+                      {acc.label}
+                    </h3>
                   </div>
-                  <div className="pt-2">
-                    <Link 
-                      to={acc.to} 
-                      className="btn-premium-primary w-full text-xs font-semibold uppercase tracking-wider"
-                    >
-                      <span>{acc.btnLabel}</span>
-                      <div className="btn-icon-wrapper">
-                        <ArrowRight size={12} weight="bold" />
-                      </div>
-                    </Link>
-                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
+                    {acc.desc}
+                  </p>
+                </div>
+                <div className="pt-4">
+                  <Link to={acc.to}
+                    className="flex items-center justify-between w-full h-9 px-4 rounded-xl font-semibold text-xs transition-all active:scale-[0.98]"
+                    style={{ backgroundColor: acc.accent, color: "white", fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "all 0.25s cubic-bezier(0.16,1,0.3,1)" }}>
+                    <span>{acc.btnLabel}</span>
+                    <ArrowRight size={13} weight="bold" />
+                  </Link>
                 </div>
               </div>
             );
@@ -183,21 +167,17 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Info Footer (Double Bezel) ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner flex items-start gap-3.5">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#F0F7F9] text-[#2A6B7C] border border-[#C2DCE2] flex-shrink-0">
-            <Info size={16} weight="bold" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-[#1A2B30] uppercase tracking-wider">Sistema en desarrollo activo</p>
-            <p className="text-xs text-[#5C7078] mt-1.5 leading-relaxed">
-              Módulos de autenticación, alta de mascotas y agenda de citas completamente operativos en base de datos.
-            </p>
-          </div>
-        </div>
+      {/* ── Status Footer ── */}
+      <div className="flex items-center gap-3 px-4 py-3 rounded-xl border"
+        style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", boxShadow: "var(--shadow-ambient)" }}>
+        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-success)" }} />
+        <p className="text-xs" style={{ color: "var(--color-muted)" }}>
+          <strong style={{ color: "var(--color-text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Sistema operativo</strong>
+          {" "}— Modulos de autenticacion, alta de mascotas y agenda de citas activos en base de datos.
+        </p>
       </div>
 
     </div>
   );
 }
+

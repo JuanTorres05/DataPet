@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import {
   ChartBar,
@@ -15,7 +15,7 @@ import {
   PawPrint,
 } from '@phosphor-icons/react';
 
-/* ─── Mini Bar Chart (SVG nativo, sin dependencias) ─────────────────── */
+/* â”€â”€â”€ Mini Bar Chart (SVG nativo, sin dependencias) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function BarChart({ data, xKey, yKey, color = '#2A6B7C', height = 160 }) {
   if (!data || data.length === 0) {
     return (
@@ -35,7 +35,7 @@ function BarChart({ data, xKey, yKey, color = '#2A6B7C', height = 160 }) {
       preserveAspectRatio="none"
       className="w-full"
       style={{ height }}
-      aria-label="Gráfica de barras"
+      aria-label="GrÃ¡fica de barras"
     >
       {data.map((d, i) => {
         const val = Number(d[yKey]) || 0;
@@ -83,7 +83,7 @@ function BarChart({ data, xKey, yKey, color = '#2A6B7C', height = 160 }) {
   );
 }
 
-/* ─── Donut Chart (SVG nativo) ───────────────────────────────────────── */
+/* â”€â”€â”€ Donut Chart (SVG nativo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function DonutChart({ segments, total }) {
   const COLORS = ['#2A6B7C', '#2E7D52', '#A86A00', '#C0392B', '#6B4F7C'];
   const r = 30;
@@ -91,7 +91,7 @@ function DonutChart({ segments, total }) {
   const cy = 50;
   const circumference = 2 * Math.PI * r;
 
-  // Precalcular los offsets acumulados de forma pura sin mutación de variables externas
+  // Precalcular los offsets acumulados de forma pura sin mutaciÃ³n de variables externas
   const segmentsWithOffset = segments.map((seg, idx) => {
     const pct = total > 0 ? seg.value / total : 0;
     const offsetVal = segments
@@ -131,12 +131,12 @@ function DonutChart({ segments, total }) {
   );
 }
 
-/* ─── StatCard ───────────────────────────────────────────────────────── */
+/* â”€â”€â”€ StatCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function StatCard({ icon, label, value, color = '#2A6B7C', bg = '#F0F7F9', border = '#C2DCE2', loading }) {
   const IconComponent = icon;
   return (
-    <div className="bezel-card-outer">
-      <div className="bezel-card-inner flex items-center gap-4 h-full">
+    <div className="card">
+      <div className="flex items-center gap-4 h-full">
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 border"
           style={{ backgroundColor: bg, color, borderColor: border }}
@@ -144,7 +144,7 @@ function StatCard({ icon, label, value, color = '#2A6B7C', bg = '#F0F7F9', borde
           <IconComponent size={22} weight="duotone" />
         </div>
         <div>
-          <p className="text-2xl font-bold text-[#1A2B30] tracking-tight leading-none">
+          <p className="text-3xl font-bold leading-none">
             {loading ? <span className="text-[#5C7078] text-base">...</span> : value}
           </p>
           <p className="text-[10px] text-[#5C7078] font-bold uppercase tracking-wider mt-1 leading-tight">
@@ -156,7 +156,7 @@ function StatCard({ icon, label, value, color = '#2A6B7C', bg = '#F0F7F9', borde
   );
 }
 
-/* ─── Componente principal ───────────────────────────────────────────── */
+/* â”€â”€â”€ Componente principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 export default function ReportesPage() {
   const [resumen, setResumen] = useState(null);
   const [citasDia, setCitasDia] = useState([]);
@@ -188,7 +188,7 @@ export default function ReportesPage() {
       setCitasSemana(r3.data);
     } catch (err) {
       console.error(err);
-      setError('No se pudieron cargar los reportes. Verifica que el servidor esté activo.');
+      setError('No se pudieron cargar los reportes. Verifica que el servidor estÃ© activo.');
     } finally {
       setLoading(false);
     }
@@ -200,10 +200,10 @@ export default function ReportesPage() {
 
   const statCards = resumen
     ? [
-        { icon: Users, label: 'Clientes registrados', value: resumen.totalClientes, color: '#2A6B7C', bg: '#F0F7F9', border: '#C2DCE2' },
-        { icon: Cat, label: 'Mascotas registradas', value: resumen.totalMascotas, color: '#2A6B7C', bg: '#F0F7F9', border: '#C2DCE2' },
-        { icon: CalendarBlank, label: 'Citas totales', value: resumen.totalCitas, color: '#A86A00', bg: '#FFF4E0', border: '#FFE3B3' },
-        { icon: ClipboardText, label: 'Registros clínicos', value: resumen.totalHistorial, color: '#2E7D52', bg: '#EBF5EF', border: '#C7E2D2' },
+        { icon: Users, label: 'Clientes registrados', value: resumen.totalClientes, color: 'var(--color-primary)', bg: 'var(--color-primary-lt)', border: '#C2DCE2' },
+        { icon: Cat, label: 'Mascotas registradas', value: resumen.totalMascotas, color: 'var(--color-primary)', bg: 'var(--color-primary-lt)', border: '#C2DCE2' },
+        { icon: CalendarBlank, label: 'Citas totales', value: resumen.totalCitas, color: 'var(--color-warning)', bg: 'var(--color-warning-bg)', border: '#FFE3B3' },
+        { icon: ClipboardText, label: 'Registros clÃ­nicos', value: resumen.totalHistorial, color: 'var(--color-success)', bg: 'var(--color-success-bg)', border: '#C7E2D2' },
       ]
     : [];
 
@@ -216,19 +216,19 @@ export default function ReportesPage() {
     : [];
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
 
-      {/* ── Encabezado ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner flex items-center justify-between flex-wrap gap-4">
+      {/* â”€â”€ Encabezado â”€â”€ */}
+      <div className="card">
+        <div className=" flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#F0F7F9] text-[#2A6B7C] border border-[#C2DCE2]">
               <ChartBar size={24} weight="duotone" />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078]">Panel administrativo</p>
-              <h1 className="text-xl font-bold text-[#1A2B30] tracking-tight">Reportes</h1>
-              <p className="text-xs text-[#5C7078] mt-0.5">Estadísticas y métricas del sistema DataVet</p>
+              <h1 className="text-2xl font-bold">Reportes</h1>
+              <p className="text-xs text-[#5C7078] mt-0.5">EstadÃ­sticas y mÃ©tricas del sistema DataVet</p>
             </div>
           </div>
           <button
@@ -242,7 +242,7 @@ export default function ReportesPage() {
         </div>
       </div>
 
-      {/* ── Error ── */}
+      {/* â”€â”€ Error â”€â”€ */}
       {error && (
         <div className="alert-error">
           <XCircle size={18} weight="fill" className="flex-shrink-0" />
@@ -250,14 +250,14 @@ export default function ReportesPage() {
         </div>
       )}
 
-      {/* ── KPI Cards ── */}
+      {/* â”€â”€ KPI Cards â”€â”€ */}
       <div>
-        <h2 className="section-title">Métricas generales</h2>
+        <h2 className="section-title">MÃ©tricas generales</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {loading
             ? [1, 2, 3, 4].map((k) => (
-                <div key={k} className="bezel-card-outer">
-                  <div className="bezel-card-inner h-20 animate-pulse bg-[#F0F2F4] rounded-[calc(1.75rem-0.375rem)]" />
+                <div key={k} className="card">
+                  <div className=" h-20 animate-pulse bg-[#F0F2F4] rounded-[calc(1.75rem-0.375rem)]" />
                 </div>
               ))
             : statCards.map((s, i) => (
@@ -266,20 +266,20 @@ export default function ReportesPage() {
         </div>
       </div>
 
-      {/* ── Estado de Citas + Top Veterinario ── */}
+      {/* â”€â”€ Estado de Citas + Top Veterinario â”€â”€ */}
       {resumen && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Donut – estado de citas */}
-          <div className="bezel-card-outer">
-            <div className="bezel-card-inner">
+          {/* Donut â€“ estado de citas */}
+          <div className="card">
+            <div className="">
               <h2 className="section-title mb-4">Estado de citas</h2>
               <div className="flex items-center gap-6 flex-wrap">
                 <DonutChart segments={donutSegments} total={resumen.totalCitas} />
                 <div className="space-y-3 flex-1 min-w-[140px]">
                   {[
-                    { label: 'Atendidas', value: resumen.citasAtendidas, icon: CheckCircle, color: '#2E7D52', bg: '#EBF5EF' },
-                    { label: 'Pendientes', value: resumen.citasPendientes, icon: Clock, color: '#A86A00', bg: '#FFF4E0' },
+                    { label: 'Atendidas', value: resumen.citasAtendidas, icon: CheckCircle, color: 'var(--color-success)', bg: 'var(--color-success-bg)' },
+                    { label: 'Pendientes', value: resumen.citasPendientes, icon: Clock, color: 'var(--color-warning)', bg: 'var(--color-warning-bg)' },
                     { label: 'Canceladas', value: resumen.citasCanceladas, icon: XCircle, color: '#C0392B', bg: '#FDECEA' },
                   ].map((item) => {
                     const ItemIcon = item.icon;
@@ -306,13 +306,13 @@ export default function ReportesPage() {
           {/* Top Vet + Top Especie */}
           <div className="space-y-5">
             {resumen.topVeterinario && (
-              <div className="bezel-card-outer">
-                <div className="bezel-card-inner flex items-center gap-4">
+              <div className="card">
+                <div className=" flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-[#FFF4E0] text-[#A86A00] border border-[#FFE3B3] flex-shrink-0">
                     <Trophy size={22} weight="duotone" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078]">Veterinario más activo</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078]">Veterinario mÃ¡s activo</p>
                     <p className="text-base font-bold text-[#1A2B30] tracking-tight">{resumen.topVeterinario.veterinario}</p>
                     <p className="text-xs text-[#5C7078]">{resumen.topVeterinario.totalAtendidas} citas atendidas</p>
                   </div>
@@ -321,13 +321,13 @@ export default function ReportesPage() {
             )}
 
             {resumen.topEspecies.length > 0 && (
-              <div className="bezel-card-outer">
-                <div className="bezel-card-inner">
+              <div className="card">
+                <div className="">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#F0F7F9] text-[#2A6B7C] border border-[#C2DCE2]">
                       <PawPrint size={14} weight="fill" />
                     </div>
-                    <h2 className="section-title mb-0">Especies más frecuentes</h2>
+                    <h2 className="section-title mb-0">Especies mÃ¡s frecuentes</h2>
                   </div>
                   <div className="space-y-2">
                     {resumen.topEspecies.map((e, i) => {
@@ -341,7 +341,7 @@ export default function ReportesPage() {
                           <div className="h-1.5 bg-[#E2E8EA] rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-700"
-                              style={{ width: `${pct}%`, backgroundColor: '#2A6B7C' }}
+                              style={{ width: `${pct}%`, backgroundcolor: 'var(--color-primary)' }}
                             />
                           </div>
                         </div>
@@ -355,13 +355,13 @@ export default function ReportesPage() {
         </div>
       )}
 
-      {/* ── Gráfica de Citas por Día ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner">
+      {/* â”€â”€ GrÃ¡fica de Citas por DÃ­a â”€â”€ */}
+      <div className="card">
+        <div className="">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
             <div>
-              <h2 className="section-title mb-0">Citas por día</h2>
-              <p className="text-xs text-[#5C7078]">Actividad de los últimos {diasFiltro} días</p>
+              <h2 className="section-title mb-0">Citas por dÃ­a</h2>
+              <p className="text-xs text-[#5C7078]">Actividad de los Ãºltimos {diasFiltro} dÃ­as</p>
             </div>
             <div className="flex items-center gap-2">
               {[7, 14, 30, 60].map((d) => (
@@ -393,11 +393,11 @@ export default function ReportesPage() {
         </div>
       </div>
 
-      {/* ── Gráfica por Día de la Semana ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner">
-          <h2 className="section-title mb-1">Actividad por día de la semana</h2>
-          <p className="text-xs text-[#5C7078] mb-4">Días con mayor concurrencia histórica</p>
+      {/* â”€â”€ GrÃ¡fica por DÃ­a de la Semana â”€â”€ */}
+      <div className="card">
+        <div className="">
+          <h2 className="section-title mb-1">Actividad por dÃ­a de la semana</h2>
+          <p className="text-xs text-[#5C7078] mb-4">DÃ­as con mayor concurrencia histÃ³rica</p>
           {loading ? (
             <div className="h-40 bg-[#F0F2F4] animate-pulse rounded-xl" />
           ) : (
@@ -412,11 +412,11 @@ export default function ReportesPage() {
         </div>
       </div>
 
-      {/* ── Tabla detallada últimos días ── */}
+      {/* â”€â”€ Tabla detallada Ãºltimos dÃ­as â”€â”€ */}
       {citasDia.length > 0 && (
-        <div className="bezel-card-outer">
-          <div className="bezel-card-inner">
-            <h2 className="section-title mb-4">Detalle por día</h2>
+        <div className="card">
+          <div className="">
+            <h2 className="section-title mb-4">Detalle por dÃ­a</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -466,3 +466,4 @@ export default function ReportesPage() {
     </div>
   );
 }
+

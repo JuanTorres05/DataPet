@@ -27,5 +27,6 @@ export function errorHandler(err, _req, res, _next) {
 
   // Cualquier otro error inesperado - no exponemos el detalle por seguridad
   // OJO: en desarrollo se puede añadir console.error(err) para ver el stack
+  console.error('[errorHandler] Error capturado:', err);
   return res.status(500).json({ message: 'Error interno del servidor.' });
 }

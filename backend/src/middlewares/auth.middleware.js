@@ -8,9 +8,11 @@ import { env } from '../config/env.js';
 // Si no tiene token o es inválido devuelve 401 y la petición no sigue
 export function requireAuth(req, res, next) {
   const auth = req.headers.authorization;
+  console.log(`[requireAuth] ${req.method} ${req.originalUrl} - Header Authorization recibido:`, auth ? `${auth.slice(0, 20)}...` : 'Ninguno');
 
   // El token debe venir en el header así: "Authorization: Bearer <token>"
   if (!auth || !auth.startsWith('Bearer ')) {
+    console.log('[requireAuth] Denegado: Token requerido o formato inválido.');
     return res.status(401).json({ message: 'Token requerido.' });
   }
 
@@ -21,9 +23,11 @@ export function requireAuth(req, res, next) {
     // Si todo está bien, guardamos los datos del usuario en req.user
     // (id, nombre, rol) para que los controladores los puedan usar
     req.user = jwt.verify(token, env.jwt.secret);
+    console.log('[requireAuth] Token verificado correctamente para usuario:', req.user.nombre, 'con rol:', req.user.rol);
     return next();
-  } catch {
+  } catch (err) {
     // El token puede fallar si está alterado o si ya venció (8 horas)
+    console.log('[requireAuth] Falló la verificación del token. Error:', err.message);
     return res.status(401).json({ message: 'Token inválido o expirado.' });
   }
 }

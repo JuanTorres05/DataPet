@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import {
@@ -17,12 +17,12 @@ import {
   Circle,
 } from '@phosphor-icons/react';
 
-/* ─── Helpers ──────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function renderSpeciesIcon(especie) {
   const e = (especie || '').toLowerCase();
   if (e.includes('perro') || e.includes('canino')) return <Dog size={22} weight="duotone" />;
   if (e.includes('gato') || e.includes('felino')) return <Cat size={22} weight="duotone" />;
-  if (e.includes('ave') || e.includes('loro') || e.includes('pájaro')) return <Bird size={22} weight="duotone" />;
+  if (e.includes('ave') || e.includes('loro') || e.includes('pÃ¡jaro')) return <Bird size={22} weight="duotone" />;
   return <PawPrint size={22} weight="duotone" />;
 }
 
@@ -42,7 +42,7 @@ function formatFecha(fechaHora) {
   });
 }
 
-/* ─── LiveIndicator ────────────────────────────────────────────────── */
+/* â”€â”€â”€ LiveIndicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function LiveIndicator({ segundos }) {
   return (
     <div className="flex items-center gap-2">
@@ -51,13 +51,13 @@ function LiveIndicator({ segundos }) {
         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
       </span>
       <span className="text-[10px] font-bold text-green-600 uppercase tracking-wider">
-        En vivo · actualiza en {segundos}s
+        En vivo Â· actualiza en {segundos}s
       </span>
     </div>
   );
 }
 
-/* ─── CitaCard ─────────────────────────────────────────────────────── */
+/* â”€â”€â”€ CitaCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function CitaCard({ cita, onCambiarEstado, loadingId, userRol }) {
   const isPendiente = cita.estado === 'pendiente';
   const isAtendida = cita.estado === 'atendida';
@@ -73,7 +73,7 @@ function CitaCard({ cita, onCambiarEstado, loadingId, userRol }) {
         isCancelada ? 'opacity-50' : ''
       }`}
     >
-      <div className="bezel-card-inner">
+      <div className="">
         <div className="flex items-start gap-3">
           {/* Icono especie */}
           <div
@@ -102,7 +102,7 @@ function CitaCard({ cita, onCambiarEstado, loadingId, userRol }) {
                   <User size={11} />
                   {cita.cliente_nombre}
                   {cita.telefono && (
-                    <span className="text-[#5C7078] ml-1">· {cita.telefono}</span>
+                    <span className="text-[#5C7078] ml-1">Â· {cita.telefono}</span>
                   )}
                 </p>
               </div>
@@ -176,7 +176,7 @@ function CitaCard({ cita, onCambiarEstado, loadingId, userRol }) {
   );
 }
 
-/* ─── Componente principal ─────────────────────────────────────────── */
+/* â”€â”€â”€ Componente principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const REFRESH_INTERVAL = 30;
 
 export default function MonitoreoPage() {
@@ -203,7 +203,7 @@ export default function MonitoreoPage() {
       setSegundos(REFRESH_INTERVAL);
     } catch (err) {
       console.error(err);
-      setError('No se pudieron cargar las citas. Verifica que el servidor esté activo.');
+      setError('No se pudieron cargar las citas. Verifica que el servidor estÃ© activo.');
     } finally {
       setLoading(false);
     }
@@ -249,11 +249,11 @@ export default function MonitoreoPage() {
   const citasCanceladas = citas.filter((c) => c.estado === 'cancelada');
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto animate-fade-in">
+    <div className="space-y-8  animate-fade-in">
 
-      {/* ── Header ── */}
-      <div className="bezel-card-outer">
-        <div className="bezel-card-inner flex items-center justify-between flex-wrap gap-4">
+      {/* â”€â”€ Header â”€â”€ */}
+      <div className="card">
+        <div className=" flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#F0F7F9] text-[#2A6B7C] border border-[#C2DCE2]">
               <Monitor size={24} weight="duotone" />
@@ -292,7 +292,7 @@ export default function MonitoreoPage() {
         </div>
       </div>
 
-      {/* ── KPIs del día ── */}
+      {/* â”€â”€ KPIs del dÃ­a â”€â”€ */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'En espera', value: citasPendientes.length, color: '#A86A00', bg: '#FFF4E0', border: '#FFE3B3', icon: Clock },
@@ -301,8 +301,8 @@ export default function MonitoreoPage() {
         ].map(({ label, value, color, bg, border, icon }) => {
           const IconComponent = icon;
           return (
-            <div key={label} className="bezel-card-outer">
-              <div className="bezel-card-inner flex items-center gap-3">
+            <div key={label} className="card">
+              <div className=" flex items-center gap-3">
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border"
                   style={{ backgroundColor: bg, color, borderColor: border }}
@@ -310,7 +310,7 @@ export default function MonitoreoPage() {
                   <IconComponent size={20} weight="duotone" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1A2B30] leading-none">{loading ? '·' : value}</p>
+                  <p className="text-2xl font-bold text-[#1A2B30] leading-none">{loading ? 'Â·' : value}</p>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C7078] mt-1">{label}</p>
                 </div>
               </div>
@@ -319,7 +319,7 @@ export default function MonitoreoPage() {
         })}
       </div>
 
-      {/* ── Error ── */}
+      {/* â”€â”€ Error â”€â”€ */}
       {error && (
         <div className="alert-error">
           <Warning size={18} weight="fill" className="flex-shrink-0" />
@@ -327,7 +327,7 @@ export default function MonitoreoPage() {
         </div>
       )}
 
-      {/* ── Citas pendientes ── */}
+      {/* â”€â”€ Citas pendientes â”€â”€ */}
       <div>
         <div className="flex items-center gap-3 mb-4">
           <h2 className="section-title mb-0">Pacientes en espera</h2>
@@ -341,20 +341,20 @@ export default function MonitoreoPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {[1, 2, 3].map((k) => (
-              <div key={k} className="bezel-card-outer">
-                <div className="bezel-card-inner h-36 animate-pulse bg-[#F0F2F4] rounded-[calc(1.75rem-0.375rem)]" />
+              <div key={k} className="card">
+                <div className=" h-36 animate-pulse bg-[#F0F2F4] rounded-[calc(1.75rem-0.375rem)]" />
               </div>
             ))}
           </div>
         ) : citasPendientes.length === 0 ? (
-          <div className="bezel-card-outer">
-            <div className="bezel-card-inner flex flex-col items-center justify-center py-12 text-center gap-3">
+          <div className="card">
+            <div className=" flex flex-col items-center justify-center py-12 text-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-[#F0F7F9] border border-[#C2DCE2] flex items-center justify-center text-[#2A6B7C]">
                 <CheckCircle size={28} weight="duotone" />
               </div>
               <div>
                 <p className="font-bold text-[#1A2B30] text-sm">Sin pacientes en espera</p>
-                <p className="text-xs text-[#5C7078] mt-1">Todos los pacientes del día han sido atendidos.</p>
+                <p className="text-xs text-[#5C7078] mt-1">Todos los pacientes del dÃ­a han sido atendidos.</p>
               </div>
             </div>
           </div>
@@ -373,7 +373,7 @@ export default function MonitoreoPage() {
         )}
       </div>
 
-      {/* ── Atendidas hoy ── */}
+      {/* â”€â”€ Atendidas hoy â”€â”€ */}
       {!loading && citasAtendidas.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-4">
@@ -396,7 +396,7 @@ export default function MonitoreoPage() {
         </div>
       )}
 
-      {/* ── Canceladas hoy (colapsado) ── */}
+      {/* â”€â”€ Canceladas hoy (colapsado) â”€â”€ */}
       {!loading && citasCanceladas.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-4">
@@ -419,17 +419,17 @@ export default function MonitoreoPage() {
         </div>
       )}
 
-      {/* ── Sin citas hoy ── */}
+      {/* â”€â”€ Sin citas hoy â”€â”€ */}
       {!loading && citas.length === 0 && !error && (
-        <div className="bezel-card-outer">
-          <div className="bezel-card-inner flex flex-col items-center justify-center py-16 text-center gap-3">
+        <div className="card">
+          <div className=" flex flex-col items-center justify-center py-16 text-center gap-3">
             <div className="w-16 h-16 rounded-2xl bg-[#F0F7F9] border border-[#C2DCE2] flex items-center justify-center text-[#2A6B7C]">
               <Circle size={32} weight="thin" />
             </div>
             <div>
               <p className="font-bold text-[#1A2B30]">Sin citas programadas hoy</p>
               <p className="text-xs text-[#5C7078] mt-1.5">
-                No hay citas agendadas para el día de hoy.{' '}
+                No hay citas agendadas para el dÃ­a de hoy.{' '}
                 <a href="/agenda" className="text-[#2A6B7C] font-semibold hover:underline">
                   Ir a la Agenda
                 </a>{' '}
@@ -443,3 +443,4 @@ export default function MonitoreoPage() {
     </div>
   );
 }
+
